@@ -1,0 +1,108 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kiyote.Files.Disk", "src\Kiyote\Files\Disk\Kiyote.Files.Disk\Kiyote.Files.Disk.csproj", "{9E850829-FBF7-4BC2-B767-D596B941A524}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AAC5FAA3-031C-454D-889D-951703B962ED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kiyote", "Kiyote", "{0BC39685-9B21-4433-9169-ED2E26B30603}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{C7F519A6-27E5-4527-892D-EE2E96DECE9B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Disk", "Disk", "{FA476F5E-65DD-4341-83AB-3F0EE168900D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kiyote.Files.Disk.UnitTests", "test\Kiyote\Files\Disk\Kiyote.Files.Disk.UnitTests\Kiyote.Files.Disk.UnitTests.csproj", "{CDA615CB-1075-45BA-8CDD-7CA0B806384D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{7FCBF746-8E59-4998-AF20-96ACC9B532AD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kiyote", "Kiyote", "{EBE7BFA8-B91F-4927-BDE6-D64FD03F0D5D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{DDDD0C7C-1E3D-48A6-9FD1-70A203B40F16}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Disk", "Disk", "{56A43596-B657-4EFD-8F53-8D898328AA4C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{01DEB633-34D1-44DC-9979-488CDFC205E3}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		nuget.config = nuget.config
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kiyote.Files", "src\Kiyote\Files\Kiyote.Files\Kiyote.Files.csproj", "{F4838ADF-7370-4DB5-9402-A2F974BDCD32}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kiyote.Files.Disk.IntegrationTests", "test\Kiyote\Files\Disk\Kiyote.Files.Disk.IntegrationTests\Kiyote.Files.Disk.IntegrationTests.csproj", "{0F1398C0-0DA6-47A0-A858-38E6A9D72936}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resource", "Resource", "{B2FA7832-2423-400D-BE83-88007A7EF8AF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kiyote.Files.Resource", "src\Kiyote\Files\Resource\Kiyote.Files.Resource\Kiyote.Files.Resource.csproj", "{A9DE88FB-30D3-408C-AE41-FE02CF36EB58}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resource", "Resource", "{B1C814D8-89E4-415E-84A1-29F35D949DCC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kiyote.Files.Resource.Manifest.IntegrationTests", "test\Kiyote\Files\Resource\Kiyote.Files.Resource.Manifest.IntegrationTests\Kiyote.Files.Resource.Manifest.IntegrationTests.csproj", "{DCB632F0-E4B1-4DC6-941F-9072C257472F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kiyote.Files.Resource.IntegrationTests", "test\Kiyote\Files\Resource\Kiyote.Files.Resource.IntegrationTests\Kiyote.Files.Resource.IntegrationTests.csproj", "{90A59C6E-A7DE-4D9F-9791-75FA24FAE6F0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9E850829-FBF7-4BC2-B767-D596B941A524}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E850829-FBF7-4BC2-B767-D596B941A524}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E850829-FBF7-4BC2-B767-D596B941A524}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E850829-FBF7-4BC2-B767-D596B941A524}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDA615CB-1075-45BA-8CDD-7CA0B806384D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDA615CB-1075-45BA-8CDD-7CA0B806384D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDA615CB-1075-45BA-8CDD-7CA0B806384D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDA615CB-1075-45BA-8CDD-7CA0B806384D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4838ADF-7370-4DB5-9402-A2F974BDCD32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4838ADF-7370-4DB5-9402-A2F974BDCD32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4838ADF-7370-4DB5-9402-A2F974BDCD32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4838ADF-7370-4DB5-9402-A2F974BDCD32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F1398C0-0DA6-47A0-A858-38E6A9D72936}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F1398C0-0DA6-47A0-A858-38E6A9D72936}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F1398C0-0DA6-47A0-A858-38E6A9D72936}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F1398C0-0DA6-47A0-A858-38E6A9D72936}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9DE88FB-30D3-408C-AE41-FE02CF36EB58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9DE88FB-30D3-408C-AE41-FE02CF36EB58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9DE88FB-30D3-408C-AE41-FE02CF36EB58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9DE88FB-30D3-408C-AE41-FE02CF36EB58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCB632F0-E4B1-4DC6-941F-9072C257472F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCB632F0-E4B1-4DC6-941F-9072C257472F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCB632F0-E4B1-4DC6-941F-9072C257472F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCB632F0-E4B1-4DC6-941F-9072C257472F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90A59C6E-A7DE-4D9F-9791-75FA24FAE6F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90A59C6E-A7DE-4D9F-9791-75FA24FAE6F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90A59C6E-A7DE-4D9F-9791-75FA24FAE6F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90A59C6E-A7DE-4D9F-9791-75FA24FAE6F0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9E850829-FBF7-4BC2-B767-D596B941A524} = {FA476F5E-65DD-4341-83AB-3F0EE168900D}
+		{0BC39685-9B21-4433-9169-ED2E26B30603} = {AAC5FAA3-031C-454D-889D-951703B962ED}
+		{C7F519A6-27E5-4527-892D-EE2E96DECE9B} = {0BC39685-9B21-4433-9169-ED2E26B30603}
+		{FA476F5E-65DD-4341-83AB-3F0EE168900D} = {C7F519A6-27E5-4527-892D-EE2E96DECE9B}
+		{CDA615CB-1075-45BA-8CDD-7CA0B806384D} = {56A43596-B657-4EFD-8F53-8D898328AA4C}
+		{EBE7BFA8-B91F-4927-BDE6-D64FD03F0D5D} = {7FCBF746-8E59-4998-AF20-96ACC9B532AD}
+		{DDDD0C7C-1E3D-48A6-9FD1-70A203B40F16} = {EBE7BFA8-B91F-4927-BDE6-D64FD03F0D5D}
+		{56A43596-B657-4EFD-8F53-8D898328AA4C} = {DDDD0C7C-1E3D-48A6-9FD1-70A203B40F16}
+		{F4838ADF-7370-4DB5-9402-A2F974BDCD32} = {C7F519A6-27E5-4527-892D-EE2E96DECE9B}
+		{0F1398C0-0DA6-47A0-A858-38E6A9D72936} = {56A43596-B657-4EFD-8F53-8D898328AA4C}
+		{B2FA7832-2423-400D-BE83-88007A7EF8AF} = {C7F519A6-27E5-4527-892D-EE2E96DECE9B}
+		{A9DE88FB-30D3-408C-AE41-FE02CF36EB58} = {B2FA7832-2423-400D-BE83-88007A7EF8AF}
+		{B1C814D8-89E4-415E-84A1-29F35D949DCC} = {DDDD0C7C-1E3D-48A6-9FD1-70A203B40F16}
+		{DCB632F0-E4B1-4DC6-941F-9072C257472F} = {B1C814D8-89E4-415E-84A1-29F35D949DCC}
+		{90A59C6E-A7DE-4D9F-9791-75FA24FAE6F0} = {B1C814D8-89E4-415E-84A1-29F35D949DCC}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6976131A-02BE-4CBD-AB2E-545CDBB56004}
+	EndGlobalSection
+EndGlobal

@@ -11,15 +11,17 @@ internal sealed class DiskFileSystemFactory : IDiskFileSystemFactory {
 	}
 
 	IReadOnlyFileSystem IDiskFileSystemFactory.CreateReadOnlyFileSystem(
+		string fileSystemId,
 		string rootFolder
 	) {
-		return new DiskFileSystem( _fileSystem, rootFolder );
+		return new DiskFileSystem( _fileSystem, fileSystemId, rootFolder );
 	}
 
 	IReadWriteFileSystem IDiskFileSystemFactory.CreateReadWriteFileSystem(
+		string fileSystemId,
 		string rootFolder
 	) {
-		return new DiskFileSystem( _fileSystem, rootFolder );
+		return new DiskFileSystem( _fileSystem, fileSystemId,rootFolder );
 	}
 
 }

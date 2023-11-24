@@ -1,10 +1,12 @@
 ﻿namespace Kiyote.Files;
 
-public interface IReadOnlyFileSystem : IFileSystemIdentifier {
+public interface IReadOnlyFileSystem: IFileSystemIdentifier {
 
-	Task<bool> TryGetContentAsync(
+	FolderId Root { get; }
+
+	Task<TFileContent> GetContentAsync<TFileContent>(
 		FileId fileId,
-		Func<Stream, Task> contentReader,
+		Func<Stream, CancellationToken, Task<TFileContent>> contentReader,
 		CancellationToken cancellationToken
 	);
 
@@ -13,4 +15,15 @@ public interface IReadOnlyFileSystem : IFileSystemIdentifier {
 		CancellationToken cancellationToken
 	);
 
+	IEnumerable<FileId> GetFilesInFolder(
+		FolderId folderId
+	);
+
+	IEnumerable<FolderId> GetFoldersInFolder(
+		FolderId folderId
+	);
+
+}
+
+public interface IReadOnlyFileSystem<T> : IReadOnlyFileSystem {
 }

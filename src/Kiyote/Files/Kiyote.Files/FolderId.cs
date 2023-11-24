@@ -1,6 +1,6 @@
 ﻿namespace Kiyote.Files;
 
 public sealed record FolderId(
-	string StorageAreaId,
+	string FileSystemId,
 	string Id
 );

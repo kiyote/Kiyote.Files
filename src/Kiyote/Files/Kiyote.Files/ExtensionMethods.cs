@@ -1,20 +1,16 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Kiyote.Files;
 
 public static class ExtensionMethods {
 
-	public static IServiceCollection AddStorageAreas(
-		this IServiceCollection services,
-		Action<IServiceProvider, IStorageAreaBuilder> action
+	public static IServiceCollection AddFiles(
+		this IServiceCollection services
 	) {
-		_ = services.AddSingleton(
-			( IServiceProvider services ) => {
-				IStorageAreaBuilder builder = new StorageAreaBuilder();
-				action( services, builder );
-				return builder.Build();
-			}
-		);
+		services.TryAddSingleton<IFileSystemFactory, FileSystemFactory>();
+		services.TryAddSingleton<IFileSystemProvider, FileSystemProvider>();
+
 		return services;
 	}
 

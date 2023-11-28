@@ -4,6 +4,9 @@ namespace Kiyote.Files;
 
 internal sealed class FileSystemProvider : IFileSystemProvider {
 
+	public const string ReadOnly = "RO";
+	public const string ReadWrite = "RW";
+
 	private readonly IServiceProvider _services;
 
 	public FileSystemProvider(
@@ -16,7 +19,7 @@ internal sealed class FileSystemProvider : IFileSystemProvider {
 		string fileSystemId
 	) {
 		return _services.GetKeyedService<IReadOnlyFileSystem>(
-			fileSystemId + FileSystemIdentifier.ReadOnly
+			fileSystemId + ReadOnly
 		);
 	}
 
@@ -30,7 +33,7 @@ internal sealed class FileSystemProvider : IFileSystemProvider {
 		string fileSystemId
 	) {
 		return _services.GetKeyedService<IReadWriteFileSystem>(
-			fileSystemId + FileSystemIdentifier.ReadWrite
+			fileSystemId + ReadWrite
 		);
 	}
 

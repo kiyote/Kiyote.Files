@@ -20,8 +20,6 @@ public sealed class DiskFilesReader : IFilesReader {
 		_config = config;
 	}
 
-	FileSystemIdentifier IFilesReader.Id => _config.Id;
-
 	async Task<TFileContent> IFilesReader.GetContentAsync<TFileContent>(
 		FileId fileId,
 		Func<Stream, CancellationToken, Task<TFileContent>> contentReader,

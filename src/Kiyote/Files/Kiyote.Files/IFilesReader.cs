@@ -2,8 +2,6 @@
 
 public interface IFilesReader {
 
-	FileSystemIdentifier Id { get; }
-
 	Task<TFileContent> GetContentAsync<TFileContent>(
 		FileId fileId,
 		Func<Stream, CancellationToken, Task<TFileContent>> contentReader,

@@ -3,15 +3,15 @@
 namespace Kiyote.Files.Resource;
 
 public sealed record ResourceFileSystemConfiguration(
-	FileSystemIdentifier Id,
+	string FileSystemId,
 	Assembly Assembly
-) {
+): IFileSystemIdentifier {
 	public FileId ToFileId(
 		FolderId folderId,
 		string name
 	) {
 		ArgumentNullException.ThrowIfNull( folderId );
-		return new FileId( Id.FileSystemId, $"{folderId.Id}{name}" );
+		return new FileId( FileSystemId, $"{folderId.Id}{name}" );
 	}
 
 	public FolderId ToFolderId(
@@ -19,6 +19,6 @@ public sealed record ResourceFileSystemConfiguration(
 		string name
 	) {
 		ArgumentNullException.ThrowIfNull( folderId );
-		return new FolderId( Id.FileSystemId, $"{folderId.Id}{name}\\" );
+		return new FolderId( FileSystemId, $"{folderId.Id}{name}\\" );
 	}
 }

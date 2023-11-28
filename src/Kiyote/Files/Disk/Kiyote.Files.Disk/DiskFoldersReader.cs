@@ -19,12 +19,10 @@ public sealed class DiskFoldersReader : IFoldersReader {
 		ArgumentNullException.ThrowIfNull( config );
 		_fileSystem = fileSystem;
 		_config = config;
-		_root = new FolderId( _config.Id.FileSystemId, "\\" );
+		_root = new FolderId( _config.FileSystemId, "\\" );
 	}
 
 	FolderId IFoldersReader.Root => _root;
-
-	FileSystemIdentifier IFoldersReader.Id => _config.Id;
 
 	IEnumerable<FileId> IFoldersReader.GetFilesInFolder(
 		FolderId folderId

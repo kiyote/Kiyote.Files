@@ -2,8 +2,6 @@
 
 public interface IFoldersReader {
 
-	FileSystemIdentifier Id { get; }
-
 	FolderId Root { get; }
 
 	IEnumerable<FileId> GetFilesInFolder(

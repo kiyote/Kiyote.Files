@@ -21,9 +21,7 @@ internal sealed class ResourceFileSystemFactory : IResourceFileSystemFactory {
 		Assembly assembly
 	) {
 		ResourceFileSystemConfiguration config = new ResourceFileSystemConfiguration(
-			new ResourceFileSystemIdentifier(
-				fileSystemId
-			),
+			fileSystemId,
 			assembly
 		);
 		IFilesReader filesReader = _filesReaderFactory.Create( config );

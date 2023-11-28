@@ -11,6 +11,9 @@ public static class ExtensionMethods {
 		_ = services.AddFiles();
 		services.TryAddSingleton<IFileSystem>( new FileSystem() );
 		services.TryAddSingleton<IDiskFileSystemFactory, DiskFileSystemFactory>();
+		services.TryAddSingleton<IDiskFilesReaderFactory, DiskFilesReaderFactory>();
+		services.TryAddSingleton<IDiskFilesWriterFactory, DiskFilesWriterFactory>();
+		services.TryAddSingleton<IDiskFoldersReaderFactory, DiskFoldersReaderFactory>();
 		return services;
 	}
 
@@ -18,7 +21,7 @@ public static class ExtensionMethods {
 		this IServiceCollection services,
 		string rootFolder
 	) where T : FileSystemIdentifier {
-		string fsid = Activator.CreateInstance<T>().Id;
+		string fsid = Activator.CreateInstance<T>().FileSystemId;
 
 		_ = services.AddDiskFiles();
 
@@ -67,7 +70,7 @@ public static class ExtensionMethods {
 		this IServiceCollection services,
 		string rootFolder
 	) where T : FileSystemIdentifier {
-		string fsid = Activator.CreateInstance<T>().Id;
+		string fsid = Activator.CreateInstance<T>().FileSystemId;
 
 		_ = services.AddDiskFiles();
 

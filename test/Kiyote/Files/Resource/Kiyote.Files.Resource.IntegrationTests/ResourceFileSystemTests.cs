@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kiyote.Files.Resource.IntegrationTests;
 
+[TestFixture]
 public class ResourceFileSystemTests {
 
 	private IServiceScope _scope;

@@ -1,8 +1,8 @@
 ﻿namespace Kiyote.Files.Disk.IntegrationTests;
 
-public sealed record Test : FileSystemIdentifier {
+public sealed record Test : DiskFileSystemIdentifier {
 
-	public const string FileSystemId = "Test";
+	public const string TestFileSystemId = "Test";
 
-	public Test() : base( FileSystemId ) { }
+	public Test() : base( TestFileSystemId ) { }
 }

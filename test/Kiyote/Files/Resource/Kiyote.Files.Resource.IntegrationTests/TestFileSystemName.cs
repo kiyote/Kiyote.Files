@@ -2,7 +2,8 @@
 
 public sealed record Test : FileSystemIdentifier {
 
-	public const string FileSystemId = "Test";
+	public const string TestFileSystemId = "Test";
+	public const string TestFileSystemType = "TestType";
 
-	public Test() : base( FileSystemId ) { }
+	public Test() : base( TestFileSystemId, TestFileSystemType ) { }
 }

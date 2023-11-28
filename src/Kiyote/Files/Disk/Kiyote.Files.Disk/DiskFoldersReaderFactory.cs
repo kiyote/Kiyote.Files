@@ -3,7 +3,7 @@
 internal sealed class DiskFoldersReaderFactory : IDiskFoldersReaderFactory {
 	DiskFoldersReader IDiskFoldersReaderFactory.Create(
 		IFileSystem fileSystem,
-		ConfiguredDiskFileSystem config
+		DiskFileSystemConfiguration config
 	) {
 		return new DiskFoldersReader(
 			fileSystem,

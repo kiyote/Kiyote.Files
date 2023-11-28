@@ -4,25 +4,27 @@ namespace Kiyote.Files.Resource;
 
 public sealed class ResourceFoldersReader : IFoldersReader {
 
-	private readonly ConfiguredResourceFileSystem _config;
+	private readonly ResourceFileSystemConfiguration _config;
 	private readonly FolderId _rootFolder;
 	private readonly ManifestEmbeddedFileProvider? _provider;
 
 	public ResourceFoldersReader(
-		ConfiguredResourceFileSystem config
+		ResourceFileSystemConfiguration config
 	) {
 		ArgumentNullException.ThrowIfNull( config );
 		_config = config;
+		string prefix;
 		try {
 			_provider = new ManifestEmbeddedFileProvider( config.Assembly );
-			_rootFolder = new FolderId( config.FileSystemId, "\\" );
+			prefix = "\\";
 		} catch( InvalidOperationException ) {
 			_provider = null;
-			_rootFolder = new FolderId( config.FileSystemId, "" );
+			prefix = "";
 		}
+		_rootFolder = new FolderId( config.Id.FileSystemId, prefix );
 	}
 
-	string IFoldersReader.FileSystemId => _config.FileSystemId;
+	FileSystemIdentifier IFoldersReader.Id => _config.Id;
 
 	FolderId IFoldersReader.Root => _rootFolder;
 

@@ -2,15 +2,15 @@
 
 public sealed class ResourceFilesReader : IFilesReader {
 
-	private readonly ConfiguredResourceFileSystem _config;
+	private readonly ResourceFileSystemConfiguration _config;
 
 	public ResourceFilesReader(
-		ConfiguredResourceFileSystem config
+		ResourceFileSystemConfiguration config
 	) {
 		_config = config;
 	}
 
-	string IFilesReader.FileSystemId => _config.FileSystemId;
+	FileSystemIdentifier IFilesReader.Id => _config.Id;
 
 	async Task<TFileContent> IFilesReader.GetContentAsync<TFileContent>(
 		FileId fileId,

@@ -15,6 +15,7 @@ public class DiskFileSystemTests {
 		_filesWriter = new Mock<IFilesWriter>( MockBehavior.Strict );
 		_foldersReader = new Mock<IFoldersReader>( MockBehavior.Strict );
 		_disk = new DiskFileSystem(
+			FileSystemId,
 			_filesReader.Object,
 			_filesWriter.Object,
 			_foldersReader.Object
@@ -42,10 +43,10 @@ public class DiskFileSystemTests {
 			.ReturnsAsync( expected );
 
 		string actual = await _disk.GetContentAsync(
-				fileId,
-				( Stream s, CancellationToken c ) => Task.FromResult( "" ),
-				CancellationToken.None
-			);
+			fileId,
+			( Stream s, CancellationToken c ) => Task.FromResult( "" ),
+			CancellationToken.None
+		);
 
 		Assert.AreEqual( expected, actual );
 	}

@@ -33,14 +33,17 @@ internal sealed class DiskFileSystemFactory : IDiskFileSystemFactory {
 		string fileSystemId,
 		string rootFolder
 	) {
-		ConfiguredDiskFileSystem config = new ConfiguredDiskFileSystem(
-			fileSystemId,
+		DiskFileSystemConfiguration config = new DiskFileSystemConfiguration(
+			new DiskFileSystemIdentifier(
+				fileSystemId
+			),
 			rootFolder
 		);
 		IFilesReader filesReader = _filesReaderFactory.Create( _fileSystem, config );
 		IFilesWriter filesWriter = _filesWriterFactory.Create( _fileSystem, config, filesReader );
 		IFoldersReader foldersReader = _foldersReaderFactory.Create( _fileSystem, config );
 		return new DiskFileSystem(
+			fileSystemId,
 			filesReader,
 			filesWriter,
 			foldersReader

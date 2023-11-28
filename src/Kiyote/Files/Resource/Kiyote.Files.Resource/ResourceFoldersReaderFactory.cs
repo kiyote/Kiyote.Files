@@ -3,7 +3,7 @@
 [System.Diagnostics.CodeAnalysis.SuppressMessage( "Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Registered in DI" )]
 internal sealed class ResourceFoldersReaderFactory : IResourceFoldersReaderFactory {
 	ResourceFoldersReader IResourceFoldersReaderFactory.Create(
-		ConfiguredResourceFileSystem config
+		ResourceFileSystemConfiguration config
 	) {
 		return new ResourceFoldersReader( config );
 	}

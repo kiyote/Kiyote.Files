@@ -1,7 +1,7 @@
 ﻿namespace Kiyote.Files.Disk;
 
-public sealed record ConfiguredDiskFileSystem(
-	string FileSystemId,
+public sealed record DiskFileSystemConfiguration(
+	DiskFileSystemIdentifier Id,
 	string RootFolder
 ) {
 	public void EnsureValidId(
@@ -19,7 +19,8 @@ public sealed record ConfiguredDiskFileSystem(
 		FileId fileId
 	) {
 		ArgumentNullException.ThrowIfNull( fileId );
-		return string.CompareOrdinal( FileSystemId, fileId.FileSystemId ) == 0;
+		return string.CompareOrdinal( Id.FileSystemId, fileId.FileSystemId ) == 0
+			&& string.CompareOrdinal( Id.FileSystemType, DiskFileSystemIdentifier.DiskFileSystemType ) == 0;
 	}
 
 	public void EnsureValidId(
@@ -37,7 +38,8 @@ public sealed record ConfiguredDiskFileSystem(
 		FolderId folderId
 	) {
 		ArgumentNullException.ThrowIfNull( folderId );
-		return string.CompareOrdinal( FileSystemId, folderId.FileSystemId ) == 0;
+		return string.CompareOrdinal( Id.FileSystemId, folderId.FileSystemId ) == 0
+			&& string.CompareOrdinal( Id.FileSystemType, DiskFileSystemIdentifier.DiskFileSystemType ) == 0;
 	}
 
 	public string ToPath(
@@ -68,7 +70,7 @@ public sealed record ConfiguredDiskFileSystem(
 	) {
 		ArgumentNullException.ThrowIfNull( folderId );
 		string id = folderId.Id + name + '\\';
-		return new FolderId( FileSystemId, id );
+		return new FolderId( Id.FileSystemId, id );
 	}
 
 	public FileId ToFileId(
@@ -80,6 +82,6 @@ public sealed record ConfiguredDiskFileSystem(
 			throw new ArgumentNullException( nameof( name ) );
 		}
 		string id = folderId.Id + name;
-		return new FileId( FileSystemId, id );
+		return new FileId( Id.FileSystemId, id );
 	}
 }

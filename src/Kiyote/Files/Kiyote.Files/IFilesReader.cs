@@ -2,7 +2,7 @@
 
 public interface IFilesReader {
 
-	string FileSystemId { get; }
+	FileSystemIdentifier Id { get; }
 
 	Task<TFileContent> GetContentAsync<TFileContent>(
 		FileId fileId,

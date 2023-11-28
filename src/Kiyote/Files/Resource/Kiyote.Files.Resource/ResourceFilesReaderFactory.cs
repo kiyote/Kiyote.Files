@@ -4,7 +4,7 @@
 internal sealed class ResourceFilesReaderFactory : IResourceFilesReaderFactory {
 
 	ResourceFilesReader IResourceFilesReaderFactory.Create(
-		ConfiguredResourceFileSystem config
+		ResourceFileSystemConfiguration config
 	) {
 		return new ResourceFilesReader( config );
 	}

@@ -12,9 +12,11 @@ internal sealed class ReadOnlyFileSystemAdapter<T> : IReadOnlyFileSystem<T> {
 
 	FolderId IFoldersReader.Root => _fileSystem.Root;
 
-	string IFilesReader.FileSystemId => (_fileSystem as IFilesReader).FileSystemId;
+	FileSystemIdentifier IFilesReader.Id => (_fileSystem as IFilesReader).Id;
 
-	string IFoldersReader.FileSystemId => (_fileSystem as IFoldersReader).FileSystemId;
+	FileSystemIdentifier IFoldersReader.Id => (_fileSystem as IFoldersReader).Id;
+
+	string IReadOnlyFileSystem.FileSystemId => _fileSystem.FileSystemId;
 
 	Task<FileMetadata> IFilesReader.GetMetadataAsync(
 		FileId fileId,

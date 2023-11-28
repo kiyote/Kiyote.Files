@@ -4,7 +4,7 @@ public interface IDiskFilesReaderFactory {
 
 	DiskFilesReader Create(
 		IFileSystem fileSystem,
-		ConfiguredDiskFileSystem config
+		DiskFileSystemConfiguration config
 	);
 
 }

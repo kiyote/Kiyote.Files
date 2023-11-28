@@ -7,24 +7,24 @@ namespace Kiyote.Files.Disk;
 public sealed class DiskFilesWriter : IFilesWriter {
 
 	private readonly IFileSystem _fileSystem;
-	private readonly ConfiguredDiskFileSystem _config;
+	private readonly DiskFileSystemConfiguration _config;
 	private readonly IFilesReader _reader;
 
 	public DiskFilesWriter(
-		ConfiguredDiskFileSystem config,
+		DiskFileSystemConfiguration config,
 		IFilesReader reader
 	) : this( new FileSystem(), config, reader ) {
 	}
 
 	public DiskFilesWriter(
 		IFileSystem fileSystem,
-		ConfiguredDiskFileSystem config,
+		DiskFileSystemConfiguration config,
 		IFilesReader reader
 	) {
 		ArgumentNullException.ThrowIfNull( fileSystem );
 		ArgumentNullException.ThrowIfNull( config );
 		ArgumentNullException.ThrowIfNull( reader );
-		if( string.CompareOrdinal( config.FileSystemId, reader.FileSystemId ) != 0 ) {
+		if( config.Id != reader.Id ) {
 			throw new InvalidOperationException( "DiskFilesWriter must be attached to same file system reader." );
 		}
 		_fileSystem = fileSystem;
@@ -32,7 +32,7 @@ public sealed class DiskFilesWriter : IFilesWriter {
 		_reader = reader;
 	}
 
-	string IFilesWriter.FileSystemId => _config.FileSystemId;
+	FileSystemIdentifier IFilesWriter.Id => _config.Id;
 
 	async Task<FileId> IFilesWriter.PutContentAsync(
 		Func<Stream, CancellationToken, Task> asyncWriter,
@@ -101,7 +101,7 @@ public sealed class DiskFilesWriter : IFilesWriter {
 				.Append( '\\' )
 				.Append( value.ToString( "X4", CultureInfo.InvariantCulture ) );
 		}
-		return new FileId( _config.FileSystemId, result.ToString() );
+		return new FileId( _config.Id.FileSystemId, result.ToString() );
 	}
 
 }

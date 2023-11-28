@@ -3,28 +3,28 @@
 public sealed class DiskFoldersReader : IFoldersReader {
 
 	private readonly IFileSystem _fileSystem;
-	private readonly ConfiguredDiskFileSystem _config;
+	private readonly DiskFileSystemConfiguration _config;
 	private readonly FolderId _root;
 
 	public DiskFoldersReader(
-		ConfiguredDiskFileSystem config
+		DiskFileSystemConfiguration config
 	) : this( new FileSystem(), config ) {
 	}
 
 	public DiskFoldersReader(
 		IFileSystem fileSystem,
-		ConfiguredDiskFileSystem config
+		DiskFileSystemConfiguration config
 	) {
 		ArgumentNullException.ThrowIfNull( fileSystem );
 		ArgumentNullException.ThrowIfNull( config );
 		_fileSystem = fileSystem;
 		_config = config;
-		_root = new FolderId( _config.FileSystemId, "\\" );
+		_root = new FolderId( _config.Id.FileSystemId, "\\" );
 	}
 
 	FolderId IFoldersReader.Root => _root;
 
-	string IFoldersReader.FileSystemId => _config.FileSystemId;
+	FileSystemIdentifier IFoldersReader.Id => _config.Id;
 
 	IEnumerable<FileId> IFoldersReader.GetFilesInFolder(
 		FolderId folderId

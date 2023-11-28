@@ -1,6 +1,6 @@
 ﻿namespace Kiyote.Files.Resource;
 
-public abstract record ResourceFileSystemIdentifier(
+public record ResourceFileSystemIdentifier(
 	string FileSystemId
 ): FileSystemIdentifier( ResourceFileSystemType, FileSystemId ) {
 

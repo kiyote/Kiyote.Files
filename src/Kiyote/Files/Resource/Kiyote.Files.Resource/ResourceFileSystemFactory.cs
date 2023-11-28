@@ -20,13 +20,16 @@ internal sealed class ResourceFileSystemFactory : IResourceFileSystemFactory {
 		string fileSystemId,
 		Assembly assembly
 	) {
-		ConfiguredResourceFileSystem config = new ConfiguredResourceFileSystem(
-			assembly,
-			fileSystemId
+		ResourceFileSystemConfiguration config = new ResourceFileSystemConfiguration(
+			new ResourceFileSystemIdentifier(
+				fileSystemId
+			),
+			assembly
 		);
 		IFilesReader filesReader = _filesReaderFactory.Create( config );
 		IFoldersReader foldersReader = _foldersReaderFactory.Create( config );
 		return new ResourceFileSystem(
+			fileSystemId,
 			filesReader,
 			foldersReader
 		);

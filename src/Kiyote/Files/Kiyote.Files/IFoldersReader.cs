@@ -2,7 +2,7 @@
 
 public interface IFoldersReader {
 
-	string FileSystemId { get; }
+	FileSystemIdentifier Id { get; }
 
 	FolderId Root { get; }
 

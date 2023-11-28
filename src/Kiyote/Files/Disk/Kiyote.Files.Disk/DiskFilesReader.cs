@@ -5,22 +5,22 @@ namespace Kiyote.Files.Disk;
 public sealed class DiskFilesReader : IFilesReader {
 
 	private readonly IFileSystem _fileSystem;
-	private readonly ConfiguredDiskFileSystem _config;
+	private readonly DiskFileSystemConfiguration _config;
 
 	public DiskFilesReader(
-		ConfiguredDiskFileSystem config
+		DiskFileSystemConfiguration config
 	) : this( new FileSystem(), config ) {
 	}
 
 	public DiskFilesReader(
 		IFileSystem fileSystem,
-		ConfiguredDiskFileSystem config
+		DiskFileSystemConfiguration config
 	) {
 		_fileSystem = fileSystem;
 		_config = config;
 	}
 
-	string IFilesReader.FileSystemId => _config.FileSystemId;
+	FileSystemIdentifier IFilesReader.Id => _config.Id;
 
 	async Task<TFileContent> IFilesReader.GetContentAsync<TFileContent>(
 		FileId fileId,

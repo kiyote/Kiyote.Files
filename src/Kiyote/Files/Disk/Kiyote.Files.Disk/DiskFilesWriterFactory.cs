@@ -3,7 +3,7 @@
 internal sealed class DiskFilesWriterFactory : IDiskFilesWriterFactory {
 	DiskFilesWriter IDiskFilesWriterFactory.Create(
 		IFileSystem fileSystem,
-		ConfiguredDiskFileSystem config,
+		DiskFileSystemConfiguration config,
 		IFilesReader reader
 	) {
 		return new DiskFilesWriter(

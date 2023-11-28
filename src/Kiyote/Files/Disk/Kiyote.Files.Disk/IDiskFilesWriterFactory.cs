@@ -4,7 +4,7 @@ public interface IDiskFilesWriterFactory {
 
 	DiskFilesWriter Create(
 		IFileSystem fileSystem,
-		ConfiguredDiskFileSystem config,
+		DiskFileSystemConfiguration config,
 		IFilesReader reader
 	);
 }

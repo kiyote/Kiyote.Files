@@ -13,11 +13,13 @@ internal sealed class ReadWriteFileSystemAdapter<T> : IReadWriteFileSystem<T> {
 
 	FolderId IFoldersReader.Root => _fileSystem.Root;
 
-	string IFilesWriter.FileSystemId => (_fileSystem as IFilesWriter).FileSystemId;
+	FileSystemIdentifier IFilesWriter.Id => (_fileSystem as IFilesWriter).Id;
 
-	string IFilesReader.FileSystemId => (_fileSystem as IFilesReader).FileSystemId;
+	FileSystemIdentifier IFilesReader.Id => (_fileSystem as IFilesReader).Id;
 
-	string IFoldersReader.FileSystemId => (_fileSystem as IFoldersReader).FileSystemId;
+	FileSystemIdentifier IFoldersReader.Id => (_fileSystem as IFoldersReader).Id;
+
+	string IReadOnlyFileSystem.FileSystemId => _fileSystem.FileSystemId;
 
 	Task<FileMetadata> IFilesReader.GetMetadataAsync(
 		FileId fileId,

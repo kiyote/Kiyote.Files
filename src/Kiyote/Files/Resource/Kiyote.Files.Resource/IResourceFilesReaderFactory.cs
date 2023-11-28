@@ -3,7 +3,7 @@
 public interface IResourceFilesReaderFactory {
 
 	ResourceFilesReader Create(
-		ConfiguredResourceFileSystem config
+		ResourceFileSystemConfiguration config
 	);
 
 }

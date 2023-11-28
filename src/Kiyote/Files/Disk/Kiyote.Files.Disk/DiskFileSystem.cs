@@ -5,12 +5,15 @@ internal sealed class DiskFileSystem : IReadWriteFileSystem {
 	private readonly IFilesReader _filesReader;
 	private readonly IFilesWriter _filesWriter;
 	private readonly IFoldersReader _foldersReader;
+	private readonly string _fileSystemId;
 
 	public DiskFileSystem(
+		string fileSystemId,
 		IFilesReader filesReader,
 		IFilesWriter filesWriter,
 		IFoldersReader foldersReader
 	) {
+		_fileSystemId = fileSystemId;
 		_filesReader = filesReader;
 		_filesWriter = filesWriter;
 		_foldersReader = foldersReader;
@@ -22,11 +25,13 @@ internal sealed class DiskFileSystem : IReadWriteFileSystem {
 		}
 	}
 
-	string IFilesWriter.FileSystemId => _filesWriter.FileSystemId;
+	FileSystemIdentifier IFilesWriter.Id => _filesWriter.Id;
 
-	string IFilesReader.FileSystemId => _filesReader.FileSystemId;
+	FileSystemIdentifier IFilesReader.Id => _filesReader.Id;
 
-	string IFoldersReader.FileSystemId => _foldersReader.FileSystemId;
+	FileSystemIdentifier IFoldersReader.Id => _foldersReader.Id;
+
+	string IReadOnlyFileSystem.FileSystemId => _fileSystemId;
 
 	Task<T> IFilesReader.GetContentAsync<T>(
 		FileId fileId,

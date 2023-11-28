@@ -1,23 +1,29 @@
 ﻿namespace Kiyote.Files.Resource;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage( "Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Registered in DI" )]
 internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 
 	private readonly IFilesReader _filesReader;
 	private readonly IFoldersReader _foldersReader;
+	private readonly string _fileSystemId;
 
 	public ResourceFileSystem(
+		string fileSystemId,
 		IFilesReader filesReader,
 		IFoldersReader foldersReader
 	) {
+		_fileSystemId = fileSystemId;
 		_filesReader = filesReader;
 		_foldersReader = foldersReader;
 	}
 
 	FolderId IFoldersReader.Root => _foldersReader.Root;
 
-	string IFilesReader.FileSystemId => _filesReader.FileSystemId;
+	FileSystemIdentifier IFilesReader.Id => _filesReader.Id;
 
-	string IFoldersReader.FileSystemId => _foldersReader.FileSystemId;
+	FileSystemIdentifier IFoldersReader.Id => _foldersReader.Id;
+
+	string IReadOnlyFileSystem.FileSystemId => _fileSystemId;
 
 	Task<TFileContent> IFilesReader.GetContentAsync<TFileContent>(
 		FileId fileId,

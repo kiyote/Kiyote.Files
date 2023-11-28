@@ -11,6 +11,8 @@ public static class ExtensionMethods {
 	) {
 		_ = services.AddFiles();
 		services.TryAddSingleton<IResourceFileSystemFactory, ResourceFileSystemFactory>();
+		services.TryAddSingleton<IResourceFilesReaderFactory, ResourceFilesReaderFactory>();
+		services.TryAddSingleton<IResourceFoldersReaderFactory, ResourceFoldersReaderFactory>();
 		return services;
 	}
 
@@ -18,7 +20,7 @@ public static class ExtensionMethods {
 		this IServiceCollection services,
 		Assembly assembly
 	) where T: FileSystemIdentifier {
-		string fsid = Activator.CreateInstance<T>().Id;
+		string fsid = Activator.CreateInstance<T>().FileSystemId;
 
 		_ = services.AddResourceFiles();
 

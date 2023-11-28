@@ -1,101 +1,48 @@
-﻿using System.Reflection;
-using Microsoft.Extensions.FileProviders;
-
-namespace Kiyote.Files.Resource;
+﻿namespace Kiyote.Files.Resource;
 
 internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 
-	private readonly string _fileSystemId;
-	private readonly Assembly _assembly;
-	private readonly FolderId _rootFolder;
-	private readonly ManifestEmbeddedFileProvider? _provider;
+	private readonly IFilesReader _filesReader;
+	private readonly IFoldersReader _foldersReader;
 
 	public ResourceFileSystem(
-		Assembly assembly,
-		string fileSystemId
+		IFilesReader filesReader,
+		IFoldersReader foldersReader
 	) {
-		_assembly = assembly;
-		_fileSystemId = fileSystemId;
-		try {
-			_provider = new ManifestEmbeddedFileProvider( _assembly );
-			_rootFolder = new FolderId( fileSystemId, "\\" );
-		} catch( InvalidOperationException ) {
-			_provider = null;
-			_rootFolder = new FolderId( fileSystemId, "" );
-		}
+		_filesReader = filesReader;
+		_foldersReader = foldersReader;
 	}
 
-	string IFileSystemIdentifier.Id => _fileSystemId;
+	FolderId IFoldersReader.Root => _foldersReader.Root;
 
-	FolderId IReadOnlyFileSystem.Root => _rootFolder;
+	string IFilesReader.FileSystemId => _filesReader.FileSystemId;
 
-	async Task<TFileContent> IReadOnlyFileSystem.GetContentAsync<TFileContent>(
+	string IFoldersReader.FileSystemId => _foldersReader.FileSystemId;
+
+	Task<TFileContent> IFilesReader.GetContentAsync<TFileContent>(
 		FileId fileId,
 		Func<Stream, CancellationToken, Task<TFileContent>> contentReader,
 		CancellationToken cancellationToken
 	) {
-		using Stream? stream = _assembly.GetManifestResourceStream( fileId.Id ) ?? throw new FileNotFoundException();
-		return await contentReader( stream, cancellationToken );
+		return _filesReader.GetContentAsync( fileId, contentReader, cancellationToken );
 	}
 
-	IEnumerable<FileId> IReadOnlyFileSystem.GetFilesInFolder(
+	IEnumerable<FileId> IFoldersReader.GetFilesInFolder(
 		FolderId folderId
 	) {
-		if( _provider is null ) {
-			string assembly = _assembly.GetName().Name ?? "";
-			string[] names = _assembly.GetManifestResourceNames();
-			foreach( string name in names ) {
-				yield return ToFileId( folderId, name[ ( assembly.Length + 1 ).. ] );
-			}
-			yield break;
-		}
-
-		IDirectoryContents directoryContents = _provider.GetDirectoryContents( folderId.Id );
-		foreach( IFileInfo? info in directoryContents ) {
-			if( info is null ) {
-				continue;
-			}
-			if( !info.IsDirectory ) {
-				yield return ToFileId( folderId, info.Name );
-
-			}
-		}
+		return _foldersReader.GetFilesInFolder( folderId );
 	}
 
-	IEnumerable<FolderId> IReadOnlyFileSystem.GetFoldersInFolder(
+	IEnumerable<FolderId> IFoldersReader.GetFoldersInFolder(
 		FolderId folderId
 	) {
-		if( _provider is null ) {
-			yield break;
-		}
-
-		IDirectoryContents directoryContents = _provider.GetDirectoryContents( folderId.Id );
-		foreach( IFileInfo? info in directoryContents ) {
-			if( info?.IsDirectory ?? false ) {
-				yield return ToFolderId( folderId, info.Name );
-
-			}
-		}
+		return _foldersReader.GetFoldersInFolder( folderId );
 	}
 
-	Task<FileMetadata> IReadOnlyFileSystem.GetMetadataAsync(
+	Task<FileMetadata> IFilesReader.GetMetadataAsync(
 		FileId fileId,
 		CancellationToken cancellationToken
 	) {
-		throw new NotImplementedException();
-	}
-
-	private FileId ToFileId(
-		FolderId folderId,
-		string name
-	) {
-		return new FileId( _fileSystemId, $"{folderId.Id}{name}" );
-	}
-
-	private FolderId ToFolderId(
-		FolderId folderId,
-		string name
-	) {
-		return new FolderId( _fileSystemId, $"{folderId.Id}{name}\\" );
+		return _filesReader.GetMetadataAsync( fileId, cancellationToken );
 	}
 }

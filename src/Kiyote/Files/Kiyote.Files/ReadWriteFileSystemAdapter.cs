@@ -11,25 +11,29 @@ internal sealed class ReadWriteFileSystemAdapter<T> : IReadWriteFileSystem<T> {
 		_fileSystem = fileSystem;
 	}
 
-	string IFileSystemIdentifier.Id => _fileSystem.Id;
+	FolderId IFoldersReader.Root => _fileSystem.Root;
 
-	FolderId IReadOnlyFileSystem.Root => _fileSystem.Root;
+	string IFilesWriter.FileSystemId => (_fileSystem as IFilesWriter).FileSystemId;
 
-	Task<FileMetadata> IReadOnlyFileSystem.GetMetadataAsync(
+	string IFilesReader.FileSystemId => (_fileSystem as IFilesReader).FileSystemId;
+
+	string IFoldersReader.FileSystemId => (_fileSystem as IFoldersReader).FileSystemId;
+
+	Task<FileMetadata> IFilesReader.GetMetadataAsync(
 		FileId fileId,
 		CancellationToken cancellationToken
 	) {
 		return _fileSystem.GetMetadataAsync( fileId, cancellationToken );
 	}
 
-	Task<FileId> IReadWriteFileSystem.PutContentAsync(
+	Task<FileId> IFilesWriter.PutContentAsync(
 		Func<Stream, CancellationToken, Task> asyncWriter,
 		CancellationToken cancellationToken
 	) {
 		return _fileSystem.PutContentAsync( asyncWriter, cancellationToken );
 	}
 
-	Task<TFileContent> IReadOnlyFileSystem.GetContentAsync<TFileContent>(
+	Task<TFileContent> IFilesReader.GetContentAsync<TFileContent>(
 		FileId fileId,
 		Func<Stream, CancellationToken, Task<TFileContent>> contentReader,
 		CancellationToken cancellationToken
@@ -37,7 +41,7 @@ internal sealed class ReadWriteFileSystemAdapter<T> : IReadWriteFileSystem<T> {
 		return _fileSystem.GetContentAsync( fileId, contentReader, cancellationToken );
 	}
 
-	Task IReadWriteFileSystem.RenameFileAsync(
+	Task IFilesWriter.RenameFileAsync(
 		FileId fileId,
 		string name,
 		CancellationToken cancellationToken
@@ -45,13 +49,13 @@ internal sealed class ReadWriteFileSystemAdapter<T> : IReadWriteFileSystem<T> {
 		return _fileSystem.RenameFileAsync( fileId, name, cancellationToken );
 	}
 
-	IEnumerable<FileId> IReadOnlyFileSystem.GetFilesInFolder(
+	IEnumerable<FileId> IFoldersReader.GetFilesInFolder(
 		FolderId folderId
 	) {
 		return _fileSystem.GetFilesInFolder( folderId );
 	}
 
-	IEnumerable<FolderId> IReadOnlyFileSystem.GetFoldersInFolder(
+	IEnumerable<FolderId> IFoldersReader.GetFoldersInFolder(
 		FolderId folderId
 	) {
 		return _fileSystem.GetFoldersInFolder( folderId );

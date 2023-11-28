@@ -1,6 +1,6 @@
 ﻿namespace Kiyote.Files;
 
-internal sealed class ReadOnlyFileSystemAdapter<T> : IReadOnlyFileSystem<T> {
+internal sealed class ReadOnlyFileSystemAdapter<T> : IReadOnlyFileSystem<T> where T: IFileSystemIdentifier {
 
 	private readonly IReadOnlyFileSystem _fileSystem;
 

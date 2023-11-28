@@ -3,5 +3,5 @@
 public interface IReadOnlyFileSystem: IFilesReader, IFoldersReader, IFileSystemIdentifier {
 }
 
-public interface IReadOnlyFileSystem<T> : IReadOnlyFileSystem {
+public interface IReadOnlyFileSystem<T> : IReadOnlyFileSystem where T: IFileSystemIdentifier {
 }

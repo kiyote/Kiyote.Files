@@ -34,9 +34,7 @@ internal sealed class DiskFileSystemFactory : IDiskFileSystemFactory {
 		string rootFolder
 	) {
 		DiskFileSystemConfiguration config = new DiskFileSystemConfiguration(
-			new DiskFileSystemIdentifier(
-				fileSystemId
-			),
+			fileSystemId,
 			rootFolder
 		);
 		IFilesReader filesReader = _filesReaderFactory.Create( _fileSystem, config );

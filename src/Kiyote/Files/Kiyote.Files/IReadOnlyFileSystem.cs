@@ -1,9 +1,6 @@
 ﻿namespace Kiyote.Files;
 
-public interface IReadOnlyFileSystem: IFilesReader, IFoldersReader {
-
-	public string FileSystemId { get; }
-
+public interface IReadOnlyFileSystem: IFilesReader, IFoldersReader, IFileSystemIdentifier {
 }
 
 public interface IReadOnlyFileSystem<T> : IReadOnlyFileSystem {

@@ -1,8 +1,9 @@
 ﻿namespace Kiyote.Files.Resource.IntegrationTests;
 
-public sealed record Test : ResourceFileSystemIdentifier {
+public sealed record Test : IFileSystemIdentifier {
 
 	public const string TestFileSystemId = "Test";
 
-	public Test() : base( TestFileSystemId ) { }
+	string IFileSystemIdentifier.FileSystemId => TestFileSystemId;
+
 }

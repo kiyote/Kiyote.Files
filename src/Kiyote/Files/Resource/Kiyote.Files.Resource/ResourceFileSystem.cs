@@ -19,11 +19,7 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 
 	FolderId IFoldersReader.Root => _foldersReader.Root;
 
-	FileSystemIdentifier IFilesReader.Id => _filesReader.Id;
-
-	FileSystemIdentifier IFoldersReader.Id => _foldersReader.Id;
-
-	string IReadOnlyFileSystem.FileSystemId => _fileSystemId;
+	string IFileSystemIdentifier.FileSystemId => _fileSystemId;
 
 	Task<TFileContent> IFilesReader.GetContentAsync<TFileContent>(
 		FileId fileId,

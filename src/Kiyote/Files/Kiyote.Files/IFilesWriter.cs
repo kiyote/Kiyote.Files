@@ -2,8 +2,6 @@
 
 public interface IFilesWriter {
 
-	FileSystemIdentifier Id { get; }
-
 	Task<FileId> PutContentAsync(
 		Func<Stream, CancellationToken, Task> asyncWriter,
 		CancellationToken cancellationToken

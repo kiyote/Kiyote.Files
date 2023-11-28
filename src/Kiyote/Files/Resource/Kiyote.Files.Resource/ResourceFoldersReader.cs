@@ -21,10 +21,8 @@ public sealed class ResourceFoldersReader : IFoldersReader {
 			_provider = null;
 			prefix = "";
 		}
-		_rootFolder = new FolderId( config.Id.FileSystemId, prefix );
+		_rootFolder = new FolderId( config.FileSystemId, prefix );
 	}
-
-	FileSystemIdentifier IFoldersReader.Id => _config.Id;
 
 	FolderId IFoldersReader.Root => _rootFolder;
 

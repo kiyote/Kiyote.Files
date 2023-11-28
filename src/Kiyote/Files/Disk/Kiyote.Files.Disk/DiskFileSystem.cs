@@ -25,13 +25,7 @@ internal sealed class DiskFileSystem : IReadWriteFileSystem {
 		}
 	}
 
-	FileSystemIdentifier IFilesWriter.Id => _filesWriter.Id;
-
-	FileSystemIdentifier IFilesReader.Id => _filesReader.Id;
-
-	FileSystemIdentifier IFoldersReader.Id => _foldersReader.Id;
-
-	string IReadOnlyFileSystem.FileSystemId => _fileSystemId;
+	string IFileSystemIdentifier.FileSystemId => _fileSystemId;
 
 	Task<T> IFilesReader.GetContentAsync<T>(
 		FileId fileId,

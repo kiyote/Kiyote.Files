@@ -24,15 +24,10 @@ public sealed class DiskFilesWriter : IFilesWriter {
 		ArgumentNullException.ThrowIfNull( fileSystem );
 		ArgumentNullException.ThrowIfNull( config );
 		ArgumentNullException.ThrowIfNull( reader );
-		if( config.Id != reader.Id ) {
-			throw new InvalidOperationException( "DiskFilesWriter must be attached to same file system reader." );
-		}
 		_fileSystem = fileSystem;
 		_config = config;
 		_reader = reader;
 	}
-
-	FileSystemIdentifier IFilesWriter.Id => _config.Id;
 
 	async Task<FileId> IFilesWriter.PutContentAsync(
 		Func<Stream, CancellationToken, Task> asyncWriter,
@@ -101,7 +96,7 @@ public sealed class DiskFilesWriter : IFilesWriter {
 				.Append( '\\' )
 				.Append( value.ToString( "X4", CultureInfo.InvariantCulture ) );
 		}
-		return new FileId( _config.Id.FileSystemId, result.ToString() );
+		return new FileId( _config.FileSystemId, result.ToString() );
 	}
 
 }

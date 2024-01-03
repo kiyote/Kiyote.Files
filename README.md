@@ -1,3 +1,6 @@
+![CI](https://github.com/kiyote/Files/actions/workflows/ci.yml/badge.svg?branch=main)
+![coverage](https://github.com/kiyotes/Files/blob/badges/.badges/main/coverage.svg?raw=true)
+
 # Kiyote.Files
 
 Provides a file system abstraction layer for various back-ends.  These file systems can either be Read/Write or Read-Only.  The method by which the files are placed, retrieved or enumerated is abstracted from the consumer to ensure a broader compatibility between backends.
@@ -14,29 +17,24 @@ Register the location on the disk you want to use as file repository by defining
 
 Create a file system identifier for your repository:
 ```
-public sealed record Temp : FileSystemIdentifier {
+public abstract class FS {
+	public sealed class Test : IFileSystemIdentifier {
 
-	public const string FileSystemId = "Temp";
+		public const string TestFileSystemId = "Test";
 
-	public Temp() : base( FileSystemId ) { }
+		FileSystemId IFileSystemIdentifier.FileSystemId => TestFileSystemId;
+	}
 }
 ```
 
 Register the file system:
 ```
-  services.AddDiskReadWriteFileSystem<Test>( @"c:\temp" );
+  services.AddReadWriteDisk<FS.Test>( @"c:\temp" );
 ```
 
 Inject the file system in to a calss to consume it:
 ```
-   public sealed class Foo( IReadWriteFileSystem<Temp> tempFileSystem ) {
-```
-
-Alternatively, retrieve the file system from the `IFileSystemProvider`:
-```
-   public IReadWritefileSystem GetFileSystem( IFileSystemProvider fileSystemProvider ) {
-       return fileSystemProvider.GetReadWrite( Temp.FileSystemId )
-   }
+   public sealed class Foo( IFileSystem<FS.Temp> tempFileSystem ) {
 ```
 
 
@@ -44,4 +42,38 @@ Alternatively, retrieve the file system from the `IFileSystemProvider`:
 
 Provides a read-only file system wrapper around embedded resource files.
 
-For more information see [Kiyote.Files.Resource](src/Kiyote/Files/Resource/Kiyote.Files.Resource/README.md).
+### Structured file system
+
+To have a structured file system that matches the structure of the embedded resources, the resource assembly must reference the nuget package `Microsoft.Extensions.FileProviders.Embedded` in the csproj file, as well as specify `<GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>`.
+
+For example:
+```
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
+  <ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="ResourceFolder\SubFolder\subfolder.txt" />
+    <EmbeddedResource Include="root.txt" />
+  </ItemGroup>
+
+...
+```
+
+### Unstructured file system
+
+Without this embedded manifest, the resources will appear as a flat structure in the "root folder" of the file system.  The name of the files in that case will be:
+```
+{Folder}.{SubFolder}.{File Name}
+```
+From the above example:
+```
+ResourceFolder.SubFolder.subfolder.txt
+root.txt
+```

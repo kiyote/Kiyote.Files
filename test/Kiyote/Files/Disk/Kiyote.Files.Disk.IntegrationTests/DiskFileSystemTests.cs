@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Kiyote.Files.Disk.IntegrationTests;
+﻿namespace Kiyote.Files.Disk.IntegrationTests;
 
 [TestFixture]
 [ExcludeFromCodeCoverage]

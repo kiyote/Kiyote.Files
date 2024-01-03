@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Kiyote.Files.Resource.Manifest.IntegrationTests;
@@ -15,13 +16,17 @@ public class ResourceFileSystemTests {
 	[SetUp]
 	public void SetUp() {
 		IServiceCollection serviceCollection = new ServiceCollection();
-		_ = serviceCollection
-			.AddLogging()
+		serviceCollection
+			.AddLogging( ( ILoggingBuilder configure ) => {
+				configure.SetMinimumLevel( LogLevel.Debug );
+			} )
 			.AddReadOnlyResource(
 				"Test",
 				Assembly.GetExecutingAssembly(),
 				"TestResources"
-			);
+			)
+			.TryAddEnumerable( ServiceDescriptor.Singleton<ILoggerProvider, NUnitLoggerProvider>() );
+
 		IServiceProvider services = serviceCollection.BuildServiceProvider();
 		_scope = services.CreateAsyncScope();
 		_fileSystem = services.GetRequiredKeyedService<IReadOnlyFileSystem>( "Test" );

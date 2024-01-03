@@ -71,6 +71,7 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 		FolderIdentifier folderIdentifier
 	) {
 		if( _provider is null ) {
+			_logger.GetFlatFolderIdentifiers();
 			yield break;
 		}
 

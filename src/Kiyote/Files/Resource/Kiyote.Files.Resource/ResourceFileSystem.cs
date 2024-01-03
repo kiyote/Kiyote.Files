@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Microsoft.Extensions.FileProviders;
+﻿using Microsoft.Extensions.FileProviders;
 
 namespace Kiyote.Files.Resource;
 
@@ -8,20 +7,18 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 	private readonly FileSystemId _fileSystemId;
 	private readonly ManifestEmbeddedFileProvider? _provider;
 	private readonly FolderIdentifier _root;
+	private readonly ILogger<ResourceFileSystem> _logger;
 
 	public ResourceFileSystem(
-		FileSystemId fileSystemId,
-		Assembly assembly
-	) : this( fileSystemId, assembly, "" ) {
-	}
-
-	public ResourceFileSystem(
+		ILogger<ResourceFileSystem> logger,
 		FileSystemId fileSystemId,
 		Assembly assembly,
 		string rootFolder
 	) {
 		ArgumentNullException.ThrowIfNull( assembly );
 		ArgumentNullException.ThrowIfNull( rootFolder );
+		ArgumentNullException.ThrowIfNull( logger );
+		_logger = logger;
 
 		string prefix;
 		try {
@@ -41,6 +38,13 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 			_provider = null;
 			prefix = "";
 		}
+
+		if (_provider is null) {
+			_logger.FlatResourceAssembly( assembly.GetName().FullName );
+		} else {
+			_logger.ManifestResourceAssembly( assembly.GetName().FullName );
+		}
+
 		_fileSystemId = fileSystemId;
 		_root = new FolderIdentifier( fileSystemId, prefix );
 	}
@@ -67,6 +71,7 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 		FolderIdentifier folderIdentifier
 	) {
 		if( _provider is null ) {
+			_logger.GetFlatFolderIdentifiers();
 			yield break;
 		}
 

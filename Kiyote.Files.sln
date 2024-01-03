@@ -20,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		.runsettings = .runsettings
+		.github\workflows\ci.yml = .github\workflows\ci.yml
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		finecodecoverage-settings.xml = finecodecoverage-settings.xml
@@ -52,7 +53,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kiyote.Files.Resource.Integ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kiyote.Files.Resource.Manifest.IntegrationTests", "test\Kiyote\Files\Resource\Kiyote.Files.Resource.Manifest.IntegrationTests\Kiyote.Files.Resource.Manifest.IntegrationTests.csproj", "{7FE035BB-3126-4E90-A7B0-309A2BB60847}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kiyote.Files.IntegrationTests", "test\Kiyote\Files\Kiyote.Files.IntegrationTests\Kiyote.Files.IntegrationTests.csproj", "{4A7D4023-8489-40D0-A52A-E7263C29523E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kiyote.Files.IntegrationTests", "test\Kiyote\Files\Kiyote.Files.IntegrationTests\Kiyote.Files.IntegrationTests.csproj", "{4A7D4023-8489-40D0-A52A-E7263C29523E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

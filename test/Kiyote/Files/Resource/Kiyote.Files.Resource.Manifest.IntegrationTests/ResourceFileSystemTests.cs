@@ -1,5 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Kiyote.Files.Resource.Manifest.IntegrationTests;
 
@@ -8,14 +11,30 @@ namespace Kiyote.Files.Resource.Manifest.IntegrationTests;
 public class ResourceFileSystemTests {
 
 	private IReadOnlyFileSystem _fileSystem;
+	private IServiceScope _scope;
 
 	[SetUp]
 	public void SetUp() {
-		_fileSystem = new ResourceFileSystem(
-			"Test",
-			Assembly.GetExecutingAssembly(),
-			"TestResources"
-		);
+		IServiceCollection serviceCollection = new ServiceCollection();
+		serviceCollection
+			.AddLogging( ( ILoggingBuilder configure ) => {
+				configure.SetMinimumLevel( LogLevel.Debug );
+			} )
+			.AddReadOnlyResource(
+				"Test",
+				Assembly.GetExecutingAssembly(),
+				"TestResources"
+			)
+			.TryAddEnumerable( ServiceDescriptor.Singleton<ILoggerProvider, NUnitLoggerProvider>() );
+
+		IServiceProvider services = serviceCollection.BuildServiceProvider();
+		_scope = services.CreateAsyncScope();
+		_fileSystem = services.GetRequiredKeyedService<IReadOnlyFileSystem>( "Test" );
+	}
+
+	[TearDown]
+	public void TearDown() {
+		_scope?.Dispose();
 	}
 
 	[Test]
@@ -27,7 +46,10 @@ public class ResourceFileSystemTests {
 
 	[Test]
 	public void GetFolderIds_ResourcesFolder_OneFolderReturned() {
-		FolderIdentifier folderIdentifier = _fileSystem.GetFolderIdentifiers().First();
+		IEnumerable<FolderIdentifier> folderIdentifiers = _fileSystem.GetFolderIdentifiers();
+		Assert.That( folderIdentifiers.Count, Is.EqualTo( 1 ), "Unable to get folder identifiers for resource assembly root." );
+
+		FolderIdentifier folderIdentifier = folderIdentifiers.First();
 		IEnumerable<FolderIdentifier> folders = _fileSystem.GetFolderIdentifiers( folderIdentifier );
 
 		Assert.That( folders.Count(), Is.EqualTo( 0 ) );

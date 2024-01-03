@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+﻿using Kiyote.Files.Virtual;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -10,22 +9,43 @@ public static class ExtensionMethods {
 
 	public static IServiceCollection AddReadOnlyResource(
 		this IServiceCollection services,
-		Assembly assembly
+		string fileSystemId,
+		Assembly assembly,
+		string rootFolder = ""
 	) {
 		ArgumentNullException.ThrowIfNull( assembly );
 
 		services.TryAddKeyedSingleton(
-			assembly.GetName().Name,
+			fileSystemId,
 			( IServiceProvider sp, object? serviceKey ) => {
+				ILogger<ResourceFileSystem> logger = sp.GetRequiredService<ILogger<ResourceFileSystem>>();
 				IReadOnlyFileSystem fileSystem = new ResourceFileSystem(
-					assembly.FullName ?? throw new InvalidOperationException(),
+					logger,
+					fileSystemId,
 					assembly,
-					""
+					rootFolder
 				);
 				return fileSystem;
 			}
 		);
 		return services;
+	}
+
+	public static IServiceCollection AddReadOnlyResource<T>(
+		this IServiceCollection services,
+		string fileSystemId,
+		Assembly assembly,
+		string rootFolder
+	) where T: IFileSystemIdentifier {
+		return services
+			.AddReadOnlyResource( fileSystemId, assembly, rootFolder )
+			.AddSingleton<IReadOnlyFileSystem<T>>(
+				( IServiceProvider sp ) => {
+					return new ReadOnlyFileSystemAdapter<T>(
+						sp.GetRequiredKeyedService<IReadOnlyFileSystem>( fileSystemId )
+					);
+				}
+			);
 	}
 
 }

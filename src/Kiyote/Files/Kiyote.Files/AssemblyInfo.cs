@@ -1,3 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo( "Kiyote.Files.Disk.UnitTests" )]
+[assembly: InternalsVisibleTo( "Kiyote.Files.IntegrationTests" )]
+[assembly: InternalsVisibleTo( "Kiyote.Files.UnitTests" )]

@@ -1,6 +1,6 @@
-﻿namespace Kiyote.Files;
+﻿namespace Kiyote.Files.Virtual;
 
-internal sealed class ReadOnlyFileSystemAdapter<T> : IReadOnlyFileSystem<T> where T: IFileSystemIdentifier {
+public sealed class ReadOnlyFileSystemAdapter<T> : IReadOnlyFileSystem<T> where T: IFileSystemIdentifier {
 
 	private readonly IReadOnlyFileSystem _fileSystem;
 
@@ -10,34 +10,37 @@ internal sealed class ReadOnlyFileSystemAdapter<T> : IReadOnlyFileSystem<T> wher
 		_fileSystem = fileSystem;
 	}
 
-	FolderId IFoldersReader.Root => _fileSystem.Root;
-
-	string IFileSystemIdentifier.FileSystemId => _fileSystem.FileSystemId;
-
-	Task<FileMetadata> IFilesReader.GetMetadataAsync(
-		FileId fileId,
+	Task IReadOnlyFileSystem.GetContentAsync(
+		FileIdentifier fileIdentifier,
+		Func<Stream, CancellationToken, Task> contentReader,
 		CancellationToken cancellationToken
 	) {
-		return _fileSystem.GetMetadataAsync( fileId, cancellationToken );
+		return _fileSystem.GetContentAsync(
+			fileIdentifier,
+			contentReader,
+			cancellationToken
+		);
 	}
 
-	Task<TFileContent> IFilesReader.GetContentAsync<TFileContent>(
-		FileId fileId,
-		Func<Stream, CancellationToken, Task<TFileContent>> contentReader,
-		CancellationToken cancellationToken
+	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
+		FolderIdentifier folderIdentifier
 	) {
-		return _fileSystem.GetContentAsync( fileId, contentReader, cancellationToken );
+		return _fileSystem.GetFileIdentifiers(
+			folderIdentifier
+		);
 	}
 
-	IEnumerable<FileId> IFoldersReader.GetFilesInFolder(
-		FolderId folderId
-	) {
-		return _fileSystem.GetFilesInFolder( folderId );
+	IEnumerable<FolderIdentifier> IReadOnlyFileSystem.GetFolderIdentifiers() {
+		return _fileSystem.GetFolderIdentifiers();
 	}
 
-	IEnumerable<FolderId> IFoldersReader.GetFoldersInFolder(
-		FolderId folderId
+	IEnumerable<FolderIdentifier> IReadOnlyFileSystem.GetFolderIdentifiers(
+		FolderIdentifier folderIdentifier
 	) {
-		return _fileSystem.GetFoldersInFolder( folderId );
+		return _fileSystem.GetFolderIdentifiers();
+	}
+
+	FolderIdentifier IReadOnlyFileSystem.GetRoot() {
+		return _fileSystem.GetRoot();
 	}
 }

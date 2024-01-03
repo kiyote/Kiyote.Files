@@ -1,50 +1,95 @@
-﻿namespace Kiyote.Files.Resource;
+﻿using System.Reflection;
+using Microsoft.Extensions.FileProviders;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage( "Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Registered in DI" )]
+namespace Kiyote.Files.Resource;
+
 internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 
-	private readonly IFilesReader _filesReader;
-	private readonly IFoldersReader _foldersReader;
-	private readonly string _fileSystemId;
+	private readonly FileSystemId _fileSystemId;
+	private readonly ManifestEmbeddedFileProvider? _provider;
+	private readonly FolderIdentifier _root;
 
 	public ResourceFileSystem(
-		string fileSystemId,
-		IFilesReader filesReader,
-		IFoldersReader foldersReader
+		FileSystemId fileSystemId,
+		Assembly assembly
+	) : this( fileSystemId, assembly, "" ) {
+	}
+
+	public ResourceFileSystem(
+		FileSystemId fileSystemId,
+		Assembly assembly,
+		string rootFolder
 	) {
+		ArgumentNullException.ThrowIfNull( assembly );
+		ArgumentNullException.ThrowIfNull( rootFolder );
+
+		string prefix;
+		try {
+			_provider = new ManifestEmbeddedFileProvider( assembly );
+			if( string.IsNullOrWhiteSpace( rootFolder ) ) {
+				prefix = "\\";
+			} else {
+				prefix = rootFolder;
+			}
+			if( !prefix.StartsWith( '\\' ) ) {
+				prefix = "\\" + prefix;
+			}
+			if( !prefix.EndsWith( '\\' ) ) {
+				prefix += "\\";
+			}
+		} catch( InvalidOperationException ) {
+			_provider = null;
+			prefix = "";
+		}
 		_fileSystemId = fileSystemId;
-		_filesReader = filesReader;
-		_foldersReader = foldersReader;
+		_root = new FolderIdentifier( fileSystemId, prefix );
 	}
 
-	FolderId IFoldersReader.Root => _foldersReader.Root;
-
-	string IFileSystemIdentifier.FileSystemId => _fileSystemId;
-
-	Task<TFileContent> IFilesReader.GetContentAsync<TFileContent>(
-		FileId fileId,
-		Func<Stream, CancellationToken, Task<TFileContent>> contentReader,
+	Task IReadOnlyFileSystem.GetContentAsync(
+		FileIdentifier fileId,
+		Func<Stream, CancellationToken, Task> contentReader,
 		CancellationToken cancellationToken
 	) {
-		return _filesReader.GetContentAsync( fileId, contentReader, cancellationToken );
+		throw new NotImplementedException();
 	}
 
-	IEnumerable<FileId> IFoldersReader.GetFilesInFolder(
-		FolderId folderId
+	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
+		FolderIdentifier folderIdentifier
 	) {
-		return _foldersReader.GetFilesInFolder( folderId );
+		throw new NotImplementedException();
 	}
 
-	IEnumerable<FolderId> IFoldersReader.GetFoldersInFolder(
-		FolderId folderId
-	) {
-		return _foldersReader.GetFoldersInFolder( folderId );
+	IEnumerable<FolderIdentifier> IReadOnlyFileSystem.GetFolderIdentifiers() {
+		return ( this as IReadOnlyFileSystem ).GetFolderIdentifiers( _root );
 	}
 
-	Task<FileMetadata> IFilesReader.GetMetadataAsync(
-		FileId fileId,
-		CancellationToken cancellationToken
+	IEnumerable<FolderIdentifier> IReadOnlyFileSystem.GetFolderIdentifiers(
+		FolderIdentifier folderIdentifier
 	) {
-		return _filesReader.GetMetadataAsync( fileId, cancellationToken );
+		if( _provider is null ) {
+			yield break;
+		}
+
+		IDirectoryContents directoryContents = _provider.GetDirectoryContents( folderIdentifier.FolderId );
+		foreach( IFileInfo? info in directoryContents ) {
+			if( info?.IsDirectory ?? false ) {
+				yield return new FolderIdentifier(
+					_fileSystemId,
+					ToFolderId( folderIdentifier.FolderId, info.Name )
+				);
+
+			}
+		}
+	}
+
+	FolderIdentifier IReadOnlyFileSystem.GetRoot() {
+		return _root;
+	}
+
+	internal static FolderId ToFolderId(
+		FolderId folderId,
+		string folderName
+	) {
+		return new FolderId( $"{folderId}{folderName}\\" );
 	}
 }

@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage( "Naming", "CA1707:Identifiers should not contain underscores", Justification = "Test case names will contain underscores", Scope = "module" )]
+[assembly: SuppressMessage( "Naming", "CA1707:Identifiers should not contain underscores", Justification = "Test names are METHOD_CONDITION_EXPECTATION", Scope = "module" )]

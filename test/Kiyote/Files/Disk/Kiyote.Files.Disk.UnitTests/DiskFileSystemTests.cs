@@ -1,121 +1,58 @@
-namespace Kiyote.Files.Disk.Tests;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO.Abstractions;
+using Moq;
 
-public class DiskFileSystemTests {
+namespace Kiyote.Files.Disk.UnitTests;
 
-	public const string FileSystemId = "fsid";
-	public const string Root = "root";
-	private IReadWriteFileSystem _disk;
-	private Mock<IFilesReader> _filesReader;
-	private Mock<IFilesWriter> _filesWriter;
-	private Mock<IFoldersReader> _foldersReader;
+[TestFixture]
+[ExcludeFromCodeCoverage]
+public sealed class DiskFileSystemTests {
+
+	public const char Separator = '\\';
+	public const string Root = @"FAKE:\FOLDER";
+	public static readonly char[] InvalidPathChars = ['/', '\\'];
+	public static readonly char[] InvalidFileNameChars = [ '/', '\\', ':' ];
+	private Mock<System.IO.Abstractions.IFileSystem> _fileSystem;
+	private Mock<IPath> _path;
+	private IFileSystem _files;
 
 	[SetUp]
-	public void Setup() {
-		_filesReader = new Mock<IFilesReader>( MockBehavior.Strict );
-		_filesWriter = new Mock<IFilesWriter>( MockBehavior.Strict );
-		_foldersReader = new Mock<IFoldersReader>( MockBehavior.Strict );
-		_disk = new DiskFileSystem(
-			FileSystemId,
-			_filesReader.Object,
-			_filesWriter.Object,
-			_foldersReader.Object
+	public void SetUp() {
+		_path = new Mock<IPath>( MockBehavior.Strict );
+		_ = _path
+			.Setup( p => p.DirectorySeparatorChar )
+			.Returns( Separator );
+		_ = _path
+			.Setup( p => p.GetInvalidPathChars() )
+			.Returns( InvalidPathChars );
+		_ = _path
+			.Setup( p => p.DirectorySeparatorChar )
+			.Returns( '\\' );
+		_ = _path
+			.Setup( p => p.AltDirectorySeparatorChar )
+			.Returns( '/' );
+		_ = _path
+			.Setup( p => p.GetInvalidFileNameChars() )
+			.Returns( InvalidFileNameChars );
+		_fileSystem = new Mock<System.IO.Abstractions.IFileSystem>( MockBehavior.Strict );
+		_ = _fileSystem
+			.Setup( fs => fs.Path )
+			.Returns( _path.Object );
+		_files = new DiskFileSystem(
+			"Test",
+			_fileSystem.Object,
+			Root
 		);
 	}
 
 	[TearDown]
 	public void TearDown() {
-		_filesReader.VerifyAll();
-		_filesWriter.VerifyAll();
-		_foldersReader.VerifyAll();
+		_path.VerifyAll();
+		_fileSystem.VerifyAll();
 	}
 
 	[Test]
-	public async Task GetContentAsync_ConfiguredFileSystem_PassthroughCalled() {
-		FileId fileId = new FileId( "fsid", "root" );
-		string expected = "GetContentAsync";
-
-		_ = _filesReader
-			.Setup( fr => fr.GetContentAsync(
-				fileId,
-				It.IsAny<Func<Stream, CancellationToken, Task<string>>>(),
-				It.IsAny<CancellationToken>()
-			) )
-			.ReturnsAsync( expected );
-
-		string actual = await _disk.GetContentAsync(
-			fileId,
-			( Stream s, CancellationToken c ) => Task.FromResult( "" ),
-			CancellationToken.None
-		);
-
-		Assert.AreEqual( expected, actual );
-	}
-
-	[Test]
-	public async Task GetMetadataAsync_ConfiguredFileSystem_PassthroughCalled() {
-		FileId fileId = new FileId( "fsid", "root" );
-		DateTime createdOn = DateTime.UtcNow;
-		FileMetadata expected = new FileMetadata(
-			fileId,
-			"expected",
-			"expec/ted",
-			123L,
-			createdOn
-		);
-
-		_ = _filesReader
-			.Setup( fr => fr.GetMetadataAsync(
-				fileId,
-				It.IsAny<CancellationToken>()
-			) )
-			.ReturnsAsync( expected );
-
-		FileMetadata actual = await _disk.GetMetadataAsync(
-				fileId,
-				CancellationToken.None
-			);
-
-		Assert.AreEqual( expected, actual );
-	}
-
-	[Test]
-	public async Task PutContentAsync_ConfiguredFileSystem_PassthroughCalled() {
-		FileId expected = new FileId( "fsid", "root" );
-
-		_ = _filesWriter
-			.Setup( fw => fw.PutContentAsync(
-				It.IsAny<Func<Stream, CancellationToken, Task>>(),
-				It.IsAny<CancellationToken>()
-			) )
-			.ReturnsAsync( expected );
-
-		FileId actual = await _disk.PutContentAsync(
-				( Stream s, CancellationToken c ) => Task.CompletedTask,
-				CancellationToken.None
-			);
-
-		Assert.AreEqual( expected, actual );
-	}
-
-	[Test]
-	public async Task RenameFileAsync_InvalidFileId_ConfiguredFileSystem_PassthroughCalled() {
-		FileId fileId = new FileId( "fsid", "root" );
-		string expected = "RenameFileAsync";
-
-		_ = _filesWriter
-			.Setup( fw => fw.RenameFileAsync(
-				fileId,
-				expected,
-				It.IsAny<CancellationToken>()
-			) )
-			.Returns( Task.CompletedTask );
-
-		await _disk.RenameFileAsync(				
-				fileId,
-				expected,
-				CancellationToken.None
-			);
-
-		Assert.Pass();
+	public void GetRootId_ValidReader_RootReturned() {
+		Assert.That( _files.GetRoot().FolderId, Is.EqualTo( Root ) );
 	}
 }

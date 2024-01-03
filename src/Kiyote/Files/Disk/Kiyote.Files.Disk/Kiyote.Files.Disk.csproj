@@ -1,21 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\Kiyote.Files\Kiyote.Files.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\Kiyote\Files\Kiyote.Files\Kiyote.Files.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ConfigureAwait.Fody">
-        <PrivateAssets>all</PrivateAssets>
+      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Fody">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 	</PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-    <PackageReference Include="MimeTypes">
-	  <PrivateAssets>all</PrivateAssets>
-	  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-	</PackageReference>	
-	<PackageReference Include="System.IO.Abstractions" />
+    <PackageReference Include="System.IO.Abstractions" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,11 @@
+<FineCodeCoverage>
+	<Enabled>
+		True
+	</Enabled>
+	<ModulePathsExclude>
+		*Tests.dll
+	</ModulePathsExclude>
+	<Exclude>
+		*ExtensionMethods
+	</Exclude>
+</FineCodeCoverage>

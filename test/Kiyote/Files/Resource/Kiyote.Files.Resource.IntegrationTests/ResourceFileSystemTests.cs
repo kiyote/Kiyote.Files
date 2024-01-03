@@ -1,46 +1,31 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Kiyote.Files.Resource.IntegrationTests;
 
+
 [TestFixture]
+[ExcludeFromCodeCoverage]
 public class ResourceFileSystemTests {
 
-	private IServiceScope _scope;
-	private IReadOnlyFileSystem<Test> _fileSystem;
+	private IReadOnlyFileSystem _fileSystem;
 
 	[SetUp]
 	public void SetUp() {
-		IServiceCollection serviceCollection = new ServiceCollection();
-		_ = serviceCollection
-			.AddResourceReadOnlyFileSystem<Test>( Assembly.GetExecutingAssembly() );
-
-		IServiceProvider services = serviceCollection.BuildServiceProvider();
-		_scope = services.CreateScope();
-
-		_fileSystem = _scope.ServiceProvider.GetRequiredService<IReadOnlyFileSystem<Test>>();
+		_fileSystem = new ResourceFileSystem(
+			"Test",
+			Assembly.GetExecutingAssembly()
+		);
 	}
 
 	[TearDown]
 	public void TearDown() {
-		_scope.Dispose();
 	}
 
 	[Test]
-	public void GetFilesInFolder_RootFolder_ExpectedFilesReturned() {
-		string[] expected = [
-			@"ResourceFolder.folder.txt",
-			@"ResourceFolder.SubFolder.subfolder.txt",
-			@"root.txt",
-			@"ResourceFolder.noextension"
-		];
-		IEnumerable<FileId> actual = _fileSystem.GetFilesInFolder( _fileSystem.Root );
-		CollectionAssert.AreEquivalent( expected, actual.Select( f => f.Id ) );
-	}
+	public void GetFolderIdentifiers_Root_ReturnsNoFolders() {
+		IEnumerable<FolderIdentifier> folders = _fileSystem.GetFolderIdentifiers();
 
-	[Test]
-	public void GetFoldersInFolder_RootFolder_NoFoldersReturned() {
-		IEnumerable<FolderId> folders = _fileSystem.GetFoldersInFolder( _fileSystem.Root );
-		CollectionAssert.IsEmpty( folders );
+		Assert.That( folders, Is.Empty );
 	}
 }

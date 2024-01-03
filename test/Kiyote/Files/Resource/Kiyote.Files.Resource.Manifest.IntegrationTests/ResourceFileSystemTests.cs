@@ -1,69 +1,35 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Kiyote.Files.Resource.IntegrationTests;
+namespace Kiyote.Files.Resource.Manifest.IntegrationTests;
 
 [TestFixture]
+[ExcludeFromCodeCoverage]
 public class ResourceFileSystemTests {
 
-	private IServiceScope _scope;
-	private IReadOnlyFileSystem<Test> _fileSystem;
+	private IReadOnlyFileSystem _fileSystem;
 
 	[SetUp]
 	public void SetUp() {
-		IServiceCollection serviceCollection = new ServiceCollection();
-		_ = serviceCollection
-			.AddResourceReadOnlyFileSystem<Test>( Assembly.GetExecutingAssembly() );
-
-		IServiceProvider services = serviceCollection.BuildServiceProvider();
-		_scope = services.CreateScope();
-
-		_fileSystem = _scope.ServiceProvider.GetRequiredService<IReadOnlyFileSystem<Test>>();
-	}
-
-	[TearDown]
-	public void TearDown() {
-		_scope.Dispose();
+		_fileSystem = new ResourceFileSystem(
+			"Test",
+			Assembly.GetExecutingAssembly(),
+			"TestResources"
+		);
 	}
 
 	[Test]
-	public void GetFilesInFolder_RootFolder_ExpectedFilesReturned() {
-		string[] expected = [
-			@"\Microsoft.Extensions.FileProviders.Embedded.Manifest.xml",
-			@"\root.txt"
-		];
-		IEnumerable<FileId> actual = _fileSystem.GetFilesInFolder( _fileSystem.Root );
-		CollectionAssert.AreEquivalent( expected, actual.Select( f => f.Id ) );
-	}
+	public void GetFolderIds_RootFolder_OneFolderReturned() {
+		IEnumerable<FolderIdentifier> folders = _fileSystem.GetFolderIdentifiers();
 
-
-	[Test]
-	public void GetFilesInFolder_SubFolder_ExpectedFilesReturned() {
-		string[] expected = [
-			@"\ResourceFolder\folder.txt",
-			@"\ResourceFolder\noextension"
-		];
-		FolderId subFolder = _fileSystem.GetFoldersInFolder( _fileSystem.Root ).First();
-		IEnumerable<FileId> actual = _fileSystem.GetFilesInFolder( subFolder );
-		CollectionAssert.AreEquivalent( expected, actual.Select( f => f.Id ) );
+		Assert.That( folders.Count(), Is.EqualTo( 1 ) );
 	}
 
 	[Test]
-	public void GetFoldersInFolder_RootFolder_ExpectedFoldersReturned() {
-		string[] expected = [
-			@"\ResourceFolder\"
-		];
-		IEnumerable<FolderId> folders = _fileSystem.GetFoldersInFolder( _fileSystem.Root );
-		CollectionAssert.AreEquivalent( expected, folders.Select( f => f.Id ) );
-	}
+	public void GetFolderIds_ResourcesFolder_OneFolderReturned() {
+		FolderIdentifier folderIdentifier = _fileSystem.GetFolderIdentifiers().First();
+		IEnumerable<FolderIdentifier> folders = _fileSystem.GetFolderIdentifiers( folderIdentifier );
 
-	[Test]
-	public void GetFoldersInFolder_SubFolder_ExpectedFoldersReturned() {
-		string[] expected = [
-			@"\ResourceFolder\SubFolder\"
-		];
-		FolderId subFolder = _fileSystem.GetFoldersInFolder( _fileSystem.Root ).First();
-		IEnumerable<FolderId> folders = _fileSystem.GetFoldersInFolder( subFolder );
-		CollectionAssert.AreEquivalent( expected, folders.Select( f => f.Id ) );
+		Assert.That( folders.Count(), Is.EqualTo( 0 ) );
 	}
 }

@@ -40,20 +40,17 @@ jobs:
       - name: Create tool manifest
         run: dotnet new tool-manifest
         if: ${{ github.ref == 'refs/heads/main' }}        
+
+      - name: Install dotnet-coverage
+        run: dotnet tool install dotnet-coverage
+        if: ${{ github.ref == 'refs/heads/main' }}
       
       - name: Restore
         run: dotnet restore
 
-      - name: Build
-        run: dotnet build --no-restore
-
-      - name: Test
-        run: dotnet test --no-build --logger "Console;Verbosity=normal" /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=cobertura
+      - name: Build and Test
+        run: dotnet test /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=cobertura
           
-      - name: Install dotnet-coverage
-        run: dotnet tool install dotnet-coverage
-        if: ${{ github.ref == 'refs/heads/main' }}
-
       - name: Generate coverage file
         run: dotnet dotnet-coverage merge -r -o coverage.xml coverage.cobertura.xml -f cobertura
         if: ${{ github.ref == 'refs/heads/main' }}

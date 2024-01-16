@@ -18,7 +18,7 @@ public class ResourceFileSystemTests {
 		IServiceCollection serviceCollection = new ServiceCollection();
 		serviceCollection
 			.AddLogging( ( ILoggingBuilder configure ) => {
-				configure.SetMinimumLevel( LogLevel.Debug );
+				_ = configure.SetMinimumLevel( LogLevel.Debug );
 			} )
 			.AddReadOnlyResource(
 				"Test",

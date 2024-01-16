@@ -9,6 +9,8 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 	private readonly FolderIdentifier _root;
 	private readonly ILogger<ResourceFileSystem> _logger;
 
+	private readonly char _separator;
+
 	public ResourceFileSystem(
 		ILogger<ResourceFileSystem> logger,
 		FileSystemId fileSystemId,
@@ -19,20 +21,21 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 		ArgumentNullException.ThrowIfNull( rootFolder );
 		ArgumentNullException.ThrowIfNull( logger );
 		_logger = logger;
+		_separator = Path.DirectorySeparatorChar;
 
 		string prefix;
 		try {
 			_provider = new ManifestEmbeddedFileProvider( assembly );
 			if( string.IsNullOrWhiteSpace( rootFolder ) ) {
-				prefix = "\\";
+				prefix = _separator.ToString();
 			} else {
 				prefix = rootFolder;
 			}
-			if( !prefix.StartsWith( '\\' ) ) {
-				prefix = "\\" + prefix;
+			if( !prefix.StartsWith( _separator ) ) {
+				prefix = _separator + prefix;
 			}
-			if( !prefix.EndsWith( '\\' ) ) {
-				prefix += "\\";
+			if( !prefix.EndsWith( _separator ) ) {
+				prefix +=  _separator;
 			}
 		} catch( InvalidOperationException ) {
 			_provider = null;
@@ -82,7 +85,6 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 					_fileSystemId,
 					ToFolderId( folderIdentifier.FolderId, info.Name )
 				);
-
 			}
 		}
 	}
@@ -91,10 +93,10 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 		return _root;
 	}
 
-	internal static FolderId ToFolderId(
+	internal FolderId ToFolderId(
 		FolderId folderId,
 		string folderName
 	) {
-		return new FolderId( $"{folderId}{folderName}\\" );
+		return new FolderId( $"{folderId}{folderName}{_separator}" );
 	}
 }

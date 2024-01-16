@@ -38,7 +38,7 @@ jobs:
         run: dotnet new globaljson --sdk-version ${{ env.DOTNET_VERSION }}
 
       - name: Build and Test
-        run: dotnet test -c Debug /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=cobertura
+        run: dotnet test /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=cobertura
           
       - name: Create tool manifest
         run: dotnet new tool-manifest

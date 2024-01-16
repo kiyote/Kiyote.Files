@@ -37,6 +37,9 @@ jobs:
       - name: Define global.json
         run: dotnet new globaljson --sdk-version ${{ env.DOTNET_VERSION }}
 
+      - name: Build and Test
+        run: dotnet test -c Debug /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=cobertura
+          
       - name: Create tool manifest
         run: dotnet new tool-manifest
         if: ${{ github.ref == 'refs/heads/main' }}        
@@ -45,14 +48,8 @@ jobs:
         run: dotnet tool install dotnet-coverage
         if: ${{ github.ref == 'refs/heads/main' }}
       
-      - name: Restore
-        run: dotnet restore
-
-      - name: Build and Test
-        run: dotnet test -c Debug /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=cobertura
-          
       - name: Generate coverage file
-        run: dotnet dotnet-coverage merge -o coverage.xml -f cobertura TestResults\*.xml
+        run: dotnet dotnet-coverage merge -r -o coverage.xml coverage.cobertura.xml -f cobertura
         if: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Create Orphan Branch

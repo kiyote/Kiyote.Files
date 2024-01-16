@@ -18,12 +18,7 @@ env:
   DOTNET_VERSION: 8.0.100
 
 permissions:
-  actions: write
-  checks: write
-  contents: write
-  id-token: write
   pull-requests: write
-  repository-projects: write
   
 jobs:
   build:
@@ -53,7 +48,7 @@ jobs:
         run: dotnet build --no-restore
 
       - name: Test
-        run: dotnet test --no-build --logger "Console;Verbosity=normal"
+        run: dotnet test --no-build --logger "Console;Verbosity=normal" /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=cobertura
           
       - name: Install dotnet-coverage
         run: dotnet tool install dotnet-coverage

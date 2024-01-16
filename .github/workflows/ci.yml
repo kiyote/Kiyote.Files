@@ -14,6 +14,9 @@ on:
   push:
     branches: [main]
 
+env:
+  DOTNET_VERSION: 8.0.100
+
 permissions:
   pull-requests: write
   
@@ -29,8 +32,15 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
-            8.0.x
+            ${{ env.DOTNET_VERSION }}
+            
+      - name: Define global.json
+        run: dotnet new globaljson --sdk-version ${{ env.DOTNET_VERSION }}
 
+      - name: Create tool manifest
+        run: dotnet new tool-manifest
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}        
+      
       - name: Restore
         run: dotnet restore
 
@@ -39,11 +49,7 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --logger "Console;Verbosity=normal"
-      
-      - name: Create Orphan Branch
-        shell: bash
-        run: ${{ github.workspace }}/create-orphan-branch.sh badges ${{ github.ref_name }}
-    
+          
       - name: Install dotnet-coverage
         run: dotnet tool install dotnet-coverage
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
@@ -51,6 +57,10 @@ jobs:
       - name: Generate coverage file
         run: dotnet dotnet-coverage merge -r -o coverage.xml coverage.cobertura.xml -f cobertura
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+
+      - name: Create Orphan Branch
+        shell: bash
+        run: ${{ github.workspace }}/create-orphan-branch.sh badges ${{ github.ref_name }}
 
       - name: Make Coverage Badge      
         uses: action-badges/cobertura-coverage-xml-badges@0.3.0

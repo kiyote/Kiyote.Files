@@ -77,3 +77,10 @@ From the above example:
 ResourceFolder.SubFolder.subfolder.txt
 root.txt
 ```
+
+# Notes
+
+Github action failing with permission denied?
+```
+git update-index --chmod=+x ./create-orphan-branch.sh
+```

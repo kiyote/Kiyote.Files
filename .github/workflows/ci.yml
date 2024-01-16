@@ -21,16 +21,9 @@ permissions:
   actions: write
   checks: write
   contents: write
-  deployments: write
   id-token: write
-  issues: write
-  discussions: write
-  packages: write
-  pages: write
   pull-requests: write
   repository-projects: write
-  security-events: write
-  statuses: write
   
 jobs:
   build:
@@ -51,7 +44,7 @@ jobs:
 
       - name: Create tool manifest
         run: dotnet new tool-manifest
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}        
+        if: ${{ github.ref == 'refs/heads/main' }}        
       
       - name: Restore
         run: dotnet restore
@@ -64,11 +57,11 @@ jobs:
           
       - name: Install dotnet-coverage
         run: dotnet tool install dotnet-coverage
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Generate coverage file
         run: dotnet dotnet-coverage merge -r -o coverage.xml coverage.cobertura.xml -f cobertura
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Create Orphan Branch
         shell: bash
@@ -76,7 +69,7 @@ jobs:
 
       - name: Make Coverage Badge      
         uses: action-badges/cobertura-coverage-xml-badges@0.3.0
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         with:
           file-name: coverage.svg
           badge-branch: badges

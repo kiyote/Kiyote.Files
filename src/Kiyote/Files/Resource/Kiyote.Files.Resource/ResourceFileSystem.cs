@@ -17,9 +17,9 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 		Assembly assembly,
 		string rootFolder
 	) {
-		ArgumentNullException.ThrowIfNull( assembly );
-		ArgumentNullException.ThrowIfNull( rootFolder );
-		ArgumentNullException.ThrowIfNull( logger );
+		ArgumentNullException.ThrowIfNull( assembly, nameof( assembly ) );
+		ArgumentNullException.ThrowIfNull( rootFolder, nameof( rootFolder ) );
+		ArgumentNullException.ThrowIfNull( logger, nameof( logger ) );
 		_logger = logger;
 		_separator = Path.DirectorySeparatorChar;
 

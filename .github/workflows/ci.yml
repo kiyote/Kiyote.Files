@@ -39,18 +39,18 @@ jobs:
           
       - name: Create tool manifest
         run: dotnet new tool-manifest
-        if: ${{ github.ref == 'refs/heads/main' }}        
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}        
 
       - name: Install dotnet-coverage
         run: dotnet tool install dotnet-coverage
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       
       - name: Build and Test
         run: dotnet test /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=cobertura
 
       - name: Generate coverage file
         run: dotnet dotnet-coverage merge -r -o coverage.xml coverage.cobertura.xml -f cobertura
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
 
       - name: Create Orphan Branch
         shell: bash
@@ -58,7 +58,7 @@ jobs:
 
       - name: Make Coverage Badge      
         uses: action-badges/cobertura-coverage-xml-badges@0.3.0
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         with:
           file-name: coverage.svg
           badge-branch: badges

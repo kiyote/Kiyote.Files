@@ -85,4 +85,14 @@ Github action failing with permission denied?
 git update-index --chmod=+x ./create-orphan-branch.sh
 ```
 
-Still failing?  Make sure to run the `./create-orphan-branch.sh` locally once.
+Still failing?  Try running the `./create-orphan-branch.sh` locally once.
+
+
+Coverage badge failing to be pushed?
+
+Give the workflow the `contents: write` permission.
+
+
+Coverage showing as 0%
+
+Add the `coverlet.msbuild` package to your test project.

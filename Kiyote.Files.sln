@@ -56,6 +56,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kiyote.Files.Resource.Manif
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kiyote.Files.IntegrationTests", "test\Kiyote\Files\Kiyote.Files.IntegrationTests\Kiyote.Files.IntegrationTests.csproj", "{4A7D4023-8489-40D0-A52A-E7263C29523E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{8BBCBED5-396A-4EAD-BFFF-4DB580B39D6D}"
+	ProjectSection(SolutionItems) = preProject
+		.github\dependabot.yaml = .github\dependabot.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{45AE3919-C0FB-4A43-936D-04D818451D4A}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ci.yml = .github\workflows\ci.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,6 +130,7 @@ Global
 		{3BC6FA36-A481-4888-A0F5-5D19EF3919E8} = {BD7BE438-9108-451B-BDAB-98B92D8BCEBA}
 		{7FE035BB-3126-4E90-A7B0-309A2BB60847} = {BD7BE438-9108-451B-BDAB-98B92D8BCEBA}
 		{4A7D4023-8489-40D0-A52A-E7263C29523E} = {B8C30807-B5B7-48D2-89B2-E137BAA77386}
+		{45AE3919-C0FB-4A43-936D-04D818451D4A} = {8BBCBED5-396A-4EAD-BFFF-4DB580B39D6D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A770BD9C-398E-42FB-A0EC-66FB3D3AEC78}

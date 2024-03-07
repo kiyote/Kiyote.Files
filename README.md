@@ -1,5 +1,5 @@
-![CI](https://github.com/kiyote/Files/actions/workflows/ci.yml/badge.svg?branch=main)
-![coverage](https://github.com/kiyote/Files/blob/badges/.badges/main/coverage.svg?raw=true)
+![CI](https://github.com/kiyote/Kiyote.Files/actions/workflows/ci.yml/badge.svg?branch=main)
+![coverage](https://github.com/kiyote/Kiyote.Files/blob/badges/.badges/main/coverage.svg?raw=true)
 
 # Kiyote.Files
 

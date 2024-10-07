@@ -30,6 +30,12 @@ public sealed class ReadOnlyFileSystemAdapter<T> : IReadOnlyFileSystem<T> where 
 		);
 	}
 
+	FolderIdentifier IReadOnlyFileSystem.GetFolderIdentifier(
+		string folderName
+	) {
+		return _fileSystem.GetFolderIdentifier( folderName );
+	}
+
 	IEnumerable<FolderIdentifier> IReadOnlyFileSystem.GetFolderIdentifiers() {
 		return _fileSystem.GetFolderIdentifiers();
 	}

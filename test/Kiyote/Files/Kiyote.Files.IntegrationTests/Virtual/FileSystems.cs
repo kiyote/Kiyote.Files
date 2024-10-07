@@ -6,7 +6,7 @@ namespace Kiyote.Files.Virtual.IntegrationTests;
 public abstract class FS {
 	public sealed class Test : IFileSystemIdentifier {
 
-		public const string TestFileSystemId = "Test";
+		public static readonly FileSystemId TestFileSystemId = "Test";
 
 		FileSystemId IFileSystemIdentifier.FileSystemId => TestFileSystemId;
 	}

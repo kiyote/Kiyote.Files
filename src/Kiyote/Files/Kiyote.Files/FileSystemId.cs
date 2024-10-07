@@ -16,7 +16,7 @@ public sealed class FileSystemId : IEquatable<string>, IEquatable<FileSystemId> 
 	internal FileSystemId() {
 		_id = "";
 	}
-
+	
 	[System.Diagnostics.CodeAnalysis.SuppressMessage( "Usage", "CA2225:Operator overloads have named alternates", Justification = "ToString already exists" )]
 	public static implicit operator FileSystemId(
 		string id
@@ -37,7 +37,7 @@ public sealed class FileSystemId : IEquatable<string>, IEquatable<FileSystemId> 
 		if( other is null ) {
 			return false;
 		}
-		return _id == other;
+		return _id.Equals( other, StringComparison.Ordinal );
 	}
 
 	public override int GetHashCode() {
@@ -46,9 +46,9 @@ public sealed class FileSystemId : IEquatable<string>, IEquatable<FileSystemId> 
 
 	public override bool Equals( object? obj ) {
 		if( obj is FileSystemId f ) {
-			return f == _id;
+			return _id.Equals( f._id, StringComparison.Ordinal );
 		} else if( obj is string s ) {
-			return s == _id;
+			return _id.Equals( s, StringComparison.Ordinal );
 		}
 		return false;
 	}
@@ -57,42 +57,42 @@ public sealed class FileSystemId : IEquatable<string>, IEquatable<FileSystemId> 
 		FileSystemId x,
 		string y
 	) {
-		return x?._id.Equals( y, StringComparison.OrdinalIgnoreCase ) ?? false;
+		return x?._id.Equals( y, StringComparison.Ordinal ) ?? false;
 	}
 
 	public static bool operator !=(
 		FileSystemId x,
 		string y
 	) {
-		return !( x?._id.Equals( y, StringComparison.OrdinalIgnoreCase ) ?? false );
+		return !( x?._id.Equals( y, StringComparison.Ordinal ) ?? false );
 	}
 
 	public static bool operator ==(
 		string x,
 		FileSystemId y
 	) {
-		return y?._id.Equals( x, StringComparison.OrdinalIgnoreCase ) ?? false;
+		return y?._id.Equals( x, StringComparison.Ordinal ) ?? false;
 	}
 
 	public static bool operator !=(
 		string x,
 		FileSystemId y
 	) {
-		return !( y?._id.Equals( x, StringComparison.OrdinalIgnoreCase ) ?? false );
+		return !( y?._id.Equals( x, StringComparison.Ordinal ) ?? false );
 	}
 
 	public static bool operator ==(
 		FileSystemId x,
 		FileSystemId y
 	) {
-		return y?._id.Equals( x, StringComparison.OrdinalIgnoreCase ) ?? false;
+		return y?._id.Equals( x?._id, StringComparison.Ordinal ) ?? false;
 	}
 
 	public static bool operator !=(
 		FileSystemId x,
 		FileSystemId y
 	) {
-		return !( y?._id.Equals( x, StringComparison.OrdinalIgnoreCase ) ?? false );
+		return !( y?._id.Equals( x?._id, StringComparison.Ordinal ) ?? false );
 	}
 
 	public override string ToString() {
@@ -102,7 +102,7 @@ public sealed class FileSystemId : IEquatable<string>, IEquatable<FileSystemId> 
 	bool IEquatable<FileSystemId>.Equals(
 		FileSystemId? other
 	) {
-		return _id.Equals( other?._id, StringComparison.OrdinalIgnoreCase );
+		return _id.Equals( other?._id, StringComparison.Ordinal );
 	}
 }
 

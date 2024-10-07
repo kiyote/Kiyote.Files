@@ -16,7 +16,7 @@ public class ResourceFileSystemTests {
 		IServiceCollection serviceCollection = new ServiceCollection();
 		_ = serviceCollection
 			.AddLogging()
-			.AddReadOnlyResource(
+			.AddResourceFileSystem(
 				"Test",
 				Assembly.GetExecutingAssembly()
 			);
@@ -36,4 +36,5 @@ public class ResourceFileSystemTests {
 
 		Assert.That( folders, Is.Empty );
 	}
+
 }

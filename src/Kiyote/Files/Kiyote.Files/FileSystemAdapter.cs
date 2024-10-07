@@ -87,4 +87,10 @@ public sealed class FileSystemAdapter<T> : IFileSystem<T> where T : IFileSystemI
 	FolderIdentifier IReadOnlyFileSystem.GetRoot() {
 		return _fileSystem.GetRoot();
 	}
+
+	FolderIdentifier IReadOnlyFileSystem.GetFolderIdentifier(
+		string folderName
+	) {
+		return _fileSystem.GetFolderIdentifier( folderName );
+	}
 }

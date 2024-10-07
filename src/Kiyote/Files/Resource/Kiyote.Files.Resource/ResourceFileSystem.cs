@@ -4,53 +4,55 @@ namespace Kiyote.Files.Resource;
 
 internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 
-	private readonly FileSystemId _fileSystemId;
+	private readonly Assembly _assembly;
 	private readonly ManifestEmbeddedFileProvider? _provider;
 	private readonly FolderIdentifier _root;
-	private readonly ILogger<ResourceFileSystem> _logger;
-
-	private readonly char _separator;
+	private readonly ILogger<ResourceFileSystem>? _logger;
 
 	public ResourceFileSystem(
-		ILogger<ResourceFileSystem> logger,
+		ILogger<ResourceFileSystem>? logger,
 		FileSystemId fileSystemId,
 		Assembly assembly,
 		string rootFolder
 	) {
 		ArgumentNullException.ThrowIfNull( assembly, nameof( assembly ) );
 		ArgumentNullException.ThrowIfNull( rootFolder, nameof( rootFolder ) );
-		ArgumentNullException.ThrowIfNull( logger, nameof( logger ) );
 		_logger = logger;
-		_separator = Path.DirectorySeparatorChar;
+		_assembly = assembly;
+		Separator = Path.DirectorySeparatorChar;
 
 		string prefix;
 		try {
 			_provider = new ManifestEmbeddedFileProvider( assembly );
 			if( string.IsNullOrWhiteSpace( rootFolder ) ) {
-				prefix = _separator.ToString();
+				prefix = Separator.ToString();
 			} else {
 				prefix = rootFolder;
 			}
-			if( !prefix.StartsWith( _separator ) ) {
-				prefix = _separator + prefix;
+			if( !prefix.StartsWith( Separator ) ) {
+				prefix = Separator + prefix;
 			}
-			if( !prefix.EndsWith( _separator ) ) {
-				prefix +=  _separator;
+			if( !prefix.EndsWith( Separator ) ) {
+				prefix += Separator;
 			}
 		} catch( InvalidOperationException ) {
 			_provider = null;
 			prefix = "";
 		}
 
-		if (_provider is null) {
-			_logger.FlatResourceAssembly( assembly.GetName().FullName );
+		if( _provider is null ) {
+			_logger?.FlatResourceAssembly( assembly.GetName().FullName );
 		} else {
-			_logger.ManifestResourceAssembly( assembly.GetName().FullName );
+			_logger?.ManifestResourceAssembly( assembly.GetName().FullName );
 		}
 
-		_fileSystemId = fileSystemId;
+		FileSystemId = fileSystemId;
 		_root = new FolderIdentifier( fileSystemId, prefix );
 	}
+
+	internal FileSystemId FileSystemId { get; }
+
+	internal char Separator { get; }
 
 	Task IReadOnlyFileSystem.GetContentAsync(
 		FileIdentifier fileId,
@@ -63,6 +65,16 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
 		FolderIdentifier folderIdentifier
 	) {
+		if( _provider is null ) {
+			_logger?.GetFlatFileIdentifiers();
+			foreach( string resourceName in _assembly.GetManifestResourceNames()) {
+				yield return new FileIdentifier(
+					FileSystemId,
+					ToFileId( folderIdentifier.FolderId, resourceName )
+				);
+			}
+			yield break;
+		}
 		throw new NotImplementedException();
 	}
 
@@ -74,7 +86,7 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 		FolderIdentifier folderIdentifier
 	) {
 		if( _provider is null ) {
-			_logger.GetFlatFolderIdentifiers();
+			_logger?.GetFlatFolderIdentifiers();
 			yield break;
 		}
 
@@ -82,7 +94,7 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 		foreach( IFileInfo? info in directoryContents ) {
 			if( info?.IsDirectory ?? false ) {
 				yield return new FolderIdentifier(
-					_fileSystemId,
+					FileSystemId,
 					ToFolderId( folderIdentifier.FolderId, info.Name )
 				);
 			}
@@ -93,10 +105,34 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 		return _root;
 	}
 
+	FolderIdentifier IReadOnlyFileSystem.GetFolderIdentifier(
+		string folderName
+	) {
+		if( _provider is null ) {
+			_logger?.GetFlatFolder( folderName );
+			throw new NotImplementedException();
+		}
+
+		throw new NotImplementedException();
+	}
+
 	internal FolderId ToFolderId(
 		FolderId folderId,
 		string folderName
 	) {
-		return new FolderId( $"{folderId}{folderName}{_separator}" );
+		if( folderId == _root.FolderId ) {
+			return $"{folderName}{Separator}";
+		}
+		return $"{folderId}{folderName}{Separator}";
+	}
+
+	internal FileId ToFileId(
+		FolderId folderId,
+		string fileName
+	) {
+		if( folderId == _root.FolderId ) {
+			return $"{fileName}";
+		}
+		return $"{folderId}{fileName}";
 	}
 }

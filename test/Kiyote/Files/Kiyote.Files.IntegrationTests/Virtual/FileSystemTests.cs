@@ -79,7 +79,7 @@ public sealed class FileSystemTests {
 	private void CreateSingleRootedFileSystem() {
 		IServiceCollection collection = new ServiceCollection();
 		_ = collection
-			.AddDiskFiles()
+			.AddDiskFileSystem()
 			.BuildFileSystem(
 				( IServiceProvider services, IFileSystemBuilder<FS.Test> builder ) => {
 					_ = builder.AddReadWriteDisk(
@@ -98,18 +98,19 @@ public sealed class FileSystemTests {
 	private void CreateTwoRootedFileSystem() {
 		IServiceCollection collection = new ServiceCollection();
 		_ = collection
-			.AddDiskFiles()
+			.AddDiskFileSystem()
 			.BuildFileSystem(
 				( IServiceProvider services, IFileSystemBuilder<FS.Test> builder ) => {
-					_ = builder.AddReadWriteDisk(
-						services,
-						"/root1",
-						_folder1
-					).AddReadWriteDisk(
-						services,
-						"/root2",
-						_folder2
-					);
+					_ = builder
+						.AddReadWriteDisk(
+							services,
+							"/root1",
+							_folder1
+						).AddReadWriteDisk(
+							services,
+							"/root2",
+							_folder2
+						);
 				}
 			);
 

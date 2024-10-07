@@ -31,7 +31,7 @@ internal sealed class FileSystemTree {
 		string path
 	) {
 		int start = 1;
-		int end = path.AsSpan()[ start.. ].IndexOf( FileSystem.Separator ) + 1;
+		int end = path.AsSpan()[ start.. ].IndexOf( VirtualFileSystem.Separator ) + 1;
 
 		if( end <= start ) {
 			return Root;
@@ -43,7 +43,7 @@ internal sealed class FileSystemTree {
 			current = GetOrCreateNode( current, segment );
 
 			start = end + 1;
-			end = path.AsSpan()[ start.. ].IndexOf( FileSystem.Separator );
+			end = path.AsSpan()[ start.. ].IndexOf( VirtualFileSystem.Separator );
 			if( end == -1 ) {
 				break;
 			}
@@ -63,7 +63,7 @@ internal sealed class FileSystemTree {
 		ReadOnlySpan<char> path
 	) {
 		int start = 1;
-		int end = path[ start.. ].IndexOf( FileSystem.Separator ) + 1;
+		int end = path[ start.. ].IndexOf( VirtualFileSystem.Separator ) + 1;
 
 		if( end <= start ) {
 			return Root;
@@ -79,7 +79,7 @@ internal sealed class FileSystemTree {
 			}
 			current = child;
 			start = end + 1;
-			end = path[ start.. ].IndexOf( FileSystem.Separator );
+			end = path[ start.. ].IndexOf( VirtualFileSystem.Separator );
 			if( end == -1 ) {
 				break;
 			}

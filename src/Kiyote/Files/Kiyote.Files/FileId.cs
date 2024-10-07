@@ -37,7 +37,7 @@ public sealed class FileId : IEquatable<string>, IEquatable<FileId> {
 		if( other is null ) {
 			return false;
 		}
-		return _id == other;
+		return _id.Equals( other, StringComparison.Ordinal );
 	}
 
 	public override int GetHashCode() {
@@ -46,9 +46,9 @@ public sealed class FileId : IEquatable<string>, IEquatable<FileId> {
 
 	public override bool Equals( object? obj ) {
 		if( obj is FileId f ) {
-			return f == _id;
+			return _id.Equals( f._id, StringComparison.Ordinal );
 		} else if( obj is string s ) {
-			return s == _id;
+			return _id.Equals( s, StringComparison.Ordinal );
 		}
 		return false;
 	}
@@ -57,42 +57,42 @@ public sealed class FileId : IEquatable<string>, IEquatable<FileId> {
 		FileId x,
 		string y
 	) {
-		return x?._id.Equals( y, StringComparison.OrdinalIgnoreCase ) ?? false;
+		return x?._id.Equals( y, StringComparison.Ordinal ) ?? false;
 	}
 
 	public static bool operator !=(
 		FileId x,
 		string y
 	) {
-		return !( x?._id.Equals( y, StringComparison.OrdinalIgnoreCase ) ?? false );
+		return !( x?._id.Equals( y, StringComparison.Ordinal ) ?? false );
 	}
 
 	public static bool operator ==(
 		string x,
 		FileId y
 	) {
-		return y?._id.Equals( x, StringComparison.OrdinalIgnoreCase ) ?? false;
+		return y?._id.Equals( x, StringComparison.Ordinal ) ?? false;
 	}
 
 	public static bool operator !=(
 		string x,
 		FileId y
 	) {
-		return !( y?._id.Equals( x, StringComparison.OrdinalIgnoreCase ) ?? false );
+		return !( y?._id.Equals( x, StringComparison.Ordinal ) ?? false );
 	}
 
 	public static bool operator ==(
 		FileId x,
 		FileId y
 	) {
-		return y?._id.Equals( x, StringComparison.OrdinalIgnoreCase ) ?? false;
+		return y?._id.Equals( x, StringComparison.Ordinal ) ?? false;
 	}
 
 	public static bool operator !=(
 		FileId x,
 		FileId y
 	) {
-		return !( y?._id.Equals( x, StringComparison.OrdinalIgnoreCase ) ?? false );
+		return !( y?._id.Equals( x, StringComparison.Ordinal ) ?? false );
 	}
 
 	public override string ToString() {
@@ -102,7 +102,7 @@ public sealed class FileId : IEquatable<string>, IEquatable<FileId> {
 	bool IEquatable<FileId>.Equals(
 		FileId? other
 	) {
-		return _id.Equals( other?._id, StringComparison.OrdinalIgnoreCase );
+		return _id.Equals( other?._id, StringComparison.Ordinal );
 	}
 
 	public ReadOnlySpan<char> AsSpan() {

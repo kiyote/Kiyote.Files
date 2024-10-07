@@ -8,79 +8,87 @@ namespace Kiyote.Files.Disk;
 [ExcludeFromCodeCoverage]
 public static class ExtensionMethods {
 
-	public static IServiceCollection AddReadWriteDisk(
+	public static IServiceCollection AddReadWriteDiskFileSystem(
 		this IServiceCollection services,
+		FileSystemId fileSystemId,
 		string rootFolder
 	) {
-		services.AddDiskFiles();
-		services.TryAddKeyedSingleton<IFileSystem>(
-			rootFolder,
-			( IServiceProvider sp, object? serviceKey ) => {
-				string? physicalPath = serviceKey as string;
-				ArgumentException.ThrowIfNullOrWhiteSpace( physicalPath );
-				return new DiskFileSystem(
-					rootFolder,
-					sp.GetRequiredService<System.IO.Abstractions.IFileSystem>(),
-					physicalPath
-				);
-			}
-		);
+		ArgumentNullException.ThrowIfNull( fileSystemId );
+
+		services
+			.AddDiskFileSystem()
+			.TryAddKeyedSingleton<IFileSystem>(
+				fileSystemId.ToString(),
+				( IServiceProvider sp, object? serviceKey ) => {
+					ArgumentException.ThrowIfNullOrWhiteSpace( rootFolder );
+					return new DiskFileSystem(
+						fileSystemId,
+						sp.GetRequiredService<System.IO.Abstractions.IFileSystem>(),
+						rootFolder
+					);
+				}
+			);
 		return services;
 	}
 
-	public static IServiceCollection AddReadWriteDisk<T>(
+	public static IServiceCollection AddReadWriteDiskFileSystem<T>(
 		this IServiceCollection services,
 		string rootFolder
-	) where T : IFileSystemIdentifier {
+	) where T : IFileSystemIdentifier, new() {
+		IFileSystemIdentifier fsid = Activator.CreateInstance<T>();
 		services
-			.AddReadWriteDisk( rootFolder )
+			.AddReadWriteDiskFileSystem( fsid.FileSystemId, rootFolder )
 			.TryAddSingleton<IFileSystem<T>>(
 				(IServiceProvider sp) => {
 					return new FileSystemAdapter<T>(
-						sp.GetRequiredKeyedService<IFileSystem>( rootFolder )
+						sp.GetRequiredKeyedService<IFileSystem>( fsid.FileSystemId.ToString() )
 					);
 				}
 			);
 		return services;
 	}
 
-	public static IServiceCollection AddReadOnlyDisk(
+	public static IServiceCollection AddReadOnlyDiskFileSystem(
 		this IServiceCollection services,
+		FileSystemId fileSystemId,
 		string rootFolder
 	) {
-		services.AddDiskFiles();
-		services.TryAddKeyedSingleton<IReadOnlyFileSystem>(
-			rootFolder,
-			( IServiceProvider sp, object? serviceKey ) => {
-				string? physicalPath = serviceKey as string;
-				ArgumentException.ThrowIfNullOrWhiteSpace( physicalPath );
-				return new DiskFileSystem(
-					rootFolder,
-					sp.GetRequiredService<System.IO.Abstractions.IFileSystem>(),
-					physicalPath
-				);
-			}
-		);
+		ArgumentNullException.ThrowIfNull( fileSystemId );
+
+		services
+			.AddDiskFileSystem()
+			.TryAddKeyedSingleton<IReadOnlyFileSystem>(
+				fileSystemId.ToString(),
+				( IServiceProvider sp, object? serviceKey ) => {
+					ArgumentException.ThrowIfNullOrWhiteSpace( rootFolder );
+					return new DiskFileSystem(
+						fileSystemId,
+						sp.GetRequiredService<System.IO.Abstractions.IFileSystem>(),
+						rootFolder
+					);
+				}
+			);
 		return services;
 	}
 
-	public static IServiceCollection AddReadOnlyDisk<T>(
+	public static IServiceCollection AddReadOnlyDiskFileSystem<T>(
 		this IServiceCollection services,
 		string rootFolder
-	) where T : IFileSystemIdentifier {
+	) where T : IFileSystemIdentifier, new() {
+		IFileSystemIdentifier fsid = Activator.CreateInstance<T>();
 		services
-			.AddReadOnlyDisk( rootFolder )
+			.AddReadOnlyDiskFileSystem( fsid.FileSystemId, rootFolder )
 			.TryAddSingleton<IReadOnlyFileSystem<T>>(
 				( IServiceProvider sp ) => {
 					return new ReadOnlyFileSystemAdapter<T>(
-						sp.GetRequiredKeyedService<IReadOnlyFileSystem>( rootFolder )
+						sp.GetRequiredKeyedService<IReadOnlyFileSystem>( fsid.FileSystemId.ToString() )
 					);
 				}
 			);
 		return services;
 	}
 
-	public static IServiceCollection AddDiskFiles(
+	public static IServiceCollection AddDiskFileSystem(
 		this IServiceCollection services
 	) {
 		services.TryAddSingleton<System.IO.Abstractions.IFileSystem, FileSystem>();
@@ -93,12 +101,12 @@ public static class ExtensionMethods {
 		IServiceProvider services,
 		FolderId virtualRoot,
 		string physicalPath
-	) where T: IFileSystemIdentifier {
+	) where T: IFileSystemIdentifier, new() {
 		ArgumentNullException.ThrowIfNull( builder );
-		IFileSystemIdentifier fileSystemIdentifier = Activator.CreateInstance<T>();
+		IFileSystemIdentifier fsid = Activator.CreateInstance<T>();
 		System.IO.Abstractions.IFileSystem fs = services.GetRequiredService<System.IO.Abstractions.IFileSystem>();
 		DiskFileSystem fileSystem = new DiskFileSystem(
-			fileSystemIdentifier.FileSystemId,
+			fsid.FileSystemId,
 			fs,
 			physicalPath
 		);

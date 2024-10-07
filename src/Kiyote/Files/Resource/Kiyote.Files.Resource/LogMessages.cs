@@ -15,9 +15,19 @@ public static partial class LogMessages {
 		string assemblyName
 	);
 
-	[LoggerMessage( 3, LogLevel.Warning, "No folder identifiers are possible for flat resource assemblies." )]
+	[LoggerMessage( 3, LogLevel.Error, "No folder identifiers are possible for flat resource assemblies." )]
 	public static partial void GetFlatFolderIdentifiers(
 		this ILogger logger
 	);
 
+	[LoggerMessage( 4, LogLevel.Error, "No file identifiers are possible for flat resource assemblies." )]
+	public static partial void GetFlatFileIdentifiers(
+		this ILogger logger
+	);
+
+	[LoggerMessage( 5, LogLevel.Error, "Trying to get folder `{folderName}` from flat resource assembly." )]
+	public static partial void GetFlatFolder(
+		this ILogger logger,
+		string folderName
+	);
 }

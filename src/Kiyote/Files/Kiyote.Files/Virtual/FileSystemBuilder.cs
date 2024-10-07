@@ -20,7 +20,7 @@ internal sealed class FileSystemBuilder<T> : IFileSystemBuilder<T> where T : IFi
 
 	public IFileSystem<T> Build() {
 		return new FileSystemAdapter<T>(
-			new FileSystem(
+			new VirtualFileSystem(
 				_virtualPathHandler,
 				_fileSystemId,
 				_readOnly,

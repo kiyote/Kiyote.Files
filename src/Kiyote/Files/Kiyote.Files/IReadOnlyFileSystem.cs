@@ -20,6 +20,9 @@ public interface IReadOnlyFileSystem {
 		FolderIdentifier folderIdentifier
 	);
 
+	FolderIdentifier GetFolderIdentifier(
+		string folderName
+	);
 }
 
 public interface IReadOnlyFileSystem<T> : IReadOnlyFileSystem where T: IFileSystemIdentifier {

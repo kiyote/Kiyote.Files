@@ -20,7 +20,7 @@ public class ResourceFileSystemTests {
 			.AddLogging( ( ILoggingBuilder configure ) => {
 				_ = configure.SetMinimumLevel( LogLevel.Debug );
 			} )
-			.AddReadOnlyResource(
+			.AddResourceFileSystem(
 				"Test",
 				Assembly.GetExecutingAssembly(),
 				"TestResources"

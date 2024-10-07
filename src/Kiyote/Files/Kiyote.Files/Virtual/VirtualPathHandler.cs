@@ -19,7 +19,7 @@ internal sealed class VirtualPathHandler : IVirtualPathHandler {
 		Dictionary<string, string[]> pathSegments = [];
 
 		foreach( FolderId virtualPath in virtualPaths ) {
-			string[] segments = virtualPath.ToString().Split( FileSystem.Separator, StringSplitOptions.RemoveEmptyEntries );
+			string[] segments = virtualPath.ToString().Split( VirtualFileSystem.Separator, StringSplitOptions.RemoveEmptyEntries );
 			pathSegments[ virtualPath ] = segments;
 		}
 
@@ -44,11 +44,11 @@ internal sealed class VirtualPathHandler : IVirtualPathHandler {
 			if( !allMatch
 				|| i >= shortest.Length
 			) {
-				StringBuilder result = new StringBuilder( FileSystem.Separator.ToString() );
+				StringBuilder result = new StringBuilder( VirtualFileSystem.Separator.ToString() );
 				for( int j = 0; j < i; j++ ) {
 					_ = result
 						.Append( shortest[ j ] )
-						.Append( FileSystem.Separator );
+						.Append( VirtualFileSystem.Separator );
 				}
 				return result.ToString();
 			}

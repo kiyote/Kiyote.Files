@@ -187,6 +187,23 @@ internal sealed class DiskFileSystem : IFileSystem {
 		return _root;
 	}
 
+	FolderIdentifier IReadOnlyFileSystem.GetFolderIdentifier(
+		string folderName
+	) {
+		FolderId folderId = ToFolderId(
+				_root.FolderId,
+				folderName
+			);
+		string physicalPath = ToPhysicalPath( folderId );
+		if (FileSystem.Directory.Exists( physicalPath )) {
+			return new FolderIdentifier(
+				FileSystemId,
+				folderId
+			);
+		}
+		throw new FolderNotFoundException();
+	}
+
 	private string ToPhysicalPath(
 		FolderId folderId
 	) {

@@ -37,7 +37,7 @@ public sealed class FolderId : IEquatable<string>, IEquatable<FolderId> {
 		if( other is null ) {
 			return false;
 		}
-		return _id == other;
+		return _id?.Equals( other, StringComparison.Ordinal ) ?? false;
 	}
 
 	public override int GetHashCode() {
@@ -46,9 +46,9 @@ public sealed class FolderId : IEquatable<string>, IEquatable<FolderId> {
 
 	public override bool Equals( object? obj ) {
 		if( obj is FolderId f ) {
-			return f._id == _id;
+			return _id?.Equals( f._id, StringComparison.Ordinal ) ?? false;
 		} else if( obj is string s ) {
-			return s == _id;
+			return _id?.Equals( s, StringComparison.Ordinal ) ?? false;
 		}
 		return false;
 	}
@@ -57,42 +57,42 @@ public sealed class FolderId : IEquatable<string>, IEquatable<FolderId> {
 		FolderId x,
 		string y
 	) {
-		return x?._id?.Equals( y, StringComparison.OrdinalIgnoreCase ) ?? false;
+		return x?._id?.Equals( y, StringComparison.Ordinal ) ?? false;
 	}
 
 	public static bool operator !=(
 		FolderId x,
 		string y
 	) {
-		return !( x?._id?.Equals( y, StringComparison.OrdinalIgnoreCase ) ?? false );
+		return !( x?._id?.Equals( y, StringComparison.Ordinal ) ?? false );
 	}
 
 	public static bool operator ==(
 		string x,
 		FolderId y
 	) {
-		return y?._id?.Equals( x, StringComparison.OrdinalIgnoreCase ) ?? false;
+		return y?._id?.Equals( x, StringComparison.Ordinal ) ?? false;
 	}
 
 	public static bool operator !=(
 		string x,
 		FolderId y
 	) {
-		return !( y?._id?.Equals( x, StringComparison.OrdinalIgnoreCase ) ?? false );
+		return !( y?._id?.Equals( x, StringComparison.Ordinal ) ?? false );
 	}
 
 	public static bool operator ==(
 		FolderId x,
 		FolderId y
 	) {
-		return y?._id?.Equals( x, StringComparison.OrdinalIgnoreCase ) ?? false;
+		return y?._id?.Equals( x, StringComparison.Ordinal ) ?? false;
 	}
 
 	public static bool operator !=(
 		FolderId x,
 		FolderId y
 	) {
-		return !( y?._id?.Equals( x, StringComparison.OrdinalIgnoreCase ) ?? false );
+		return !( y?._id?.Equals( x, StringComparison.Ordinal ) ?? false );
 	}
 
 	public override string ToString() {
@@ -102,7 +102,7 @@ public sealed class FolderId : IEquatable<string>, IEquatable<FolderId> {
 	bool IEquatable<FolderId>.Equals(
 		FolderId? other
 	) {
-		return _id?.Equals( other?._id, StringComparison.OrdinalIgnoreCase ) ?? false;
+		return _id?.Equals( other?._id, StringComparison.Ordinal ) ?? false;
 	}
 
 	public ReadOnlySpan<char> AsSpan() {

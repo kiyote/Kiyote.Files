@@ -37,4 +37,12 @@ public class ResourceFileSystemTests {
 		Assert.That( folders, Is.Empty );
 	}
 
+	[Test]
+	public void GetFileIdentifiers_Root_Returns2Files() {
+		FolderIdentifier root = _fileSystem.GetRoot();
+		List<FileIdentifier> files = _fileSystem.GetFileIdentifiers( root ).ToList();
+
+		Assert.That( files.Count, Is.EqualTo( 2 ) );
+	}
+
 }

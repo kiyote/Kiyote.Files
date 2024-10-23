@@ -2,6 +2,8 @@
 
 internal sealed class VirtualFileSystem : IFileSystem {
 
+	public const char Separator = '/';
+
 	private readonly FileSystemId _fileSystemId;
 	private readonly FileSystemTree _tree;
 	private readonly Dictionary<Node, List<MappedFileSystem<IFileSystem>>> _readWrite;
@@ -11,8 +13,6 @@ internal sealed class VirtualFileSystem : IFileSystem {
 	private readonly string[] _invalidNames;
 	private readonly FolderIdentifier _root;
 	private readonly IVirtualPathHandler _virtualPathHandler;
-	private readonly List<MappedFileSystem<IReadOnlyFileSystem>> _unmappedRO;
-	private readonly List<MappedFileSystem<IFileSystem>> _unmappedRW;
 
 	public VirtualFileSystem(
 		IVirtualPathHandler virtualPathHandler,
@@ -22,7 +22,6 @@ internal sealed class VirtualFileSystem : IFileSystem {
 	) {
 		_virtualPathHandler = virtualPathHandler;
 		_fileSystemId = fileSystemId;
-
 		_invalidPathChars = readWrite
 			.SelectMany( rw => rw.Value.FileSystem.GetInvalidPathChars() )
 			.Distinct()
@@ -38,12 +37,12 @@ internal sealed class VirtualFileSystem : IFileSystem {
 			.Distinct()
 			.ToArray();
 
-		_tree = new FileSystemTree( _virtualPathHandler.Separator );
+		_tree = new FileSystemTree();
 		_readWrite = [];
 		_readOnly = [];
 		foreach( KeyValuePair<FolderId, MappedFileSystem<IFileSystem>> pair in readWrite ) {
-			FolderId path = pair.Key;
-			Node node = _tree.Insert( path.AsSpan() );
+			string path = pair.Key;
+			Node node = _tree.Insert( path );
 
 			if( !_readWrite.TryGetValue( node, out List<MappedFileSystem<IFileSystem>>? rwfs ) ) {
 				_readWrite[ node ] = [];
@@ -54,24 +53,33 @@ internal sealed class VirtualFileSystem : IFileSystem {
 				_readOnly[ node ] = [];
 			}
 			_readOnly[ node ].Add( new MappedFileSystem<IReadOnlyFileSystem>(
-				pair.Value.MountAtFolder,
+				pair.Value.VirtualRoot,
 				pair.Value.PathMapper,
 				pair.Value.FileSystem
 			) );
 		}
 
 		foreach( KeyValuePair<FolderId, MappedFileSystem<IReadOnlyFileSystem>> pair in readOnly ) {
-			FolderId path = pair.Key;
-			Node node = _tree.Insert( path.AsSpan() );
+			string path = pair.Key;
+			Node node = _tree.Insert( path );
 
 			if( !_readOnly.TryGetValue( node, out List<MappedFileSystem<IReadOnlyFileSystem>>? rofs ) ) {
 				_readOnly[ node ] = [];
 			}
 			_readOnly[ node ].Add( pair.Value );
 		}
-		_root = new FolderIdentifier( _fileSystemId, _virtualPathHandler.Separator.ToString() );
-		_unmappedRW = [];
-		_unmappedRO = [];
+
+		_root = new FolderIdentifier(
+			_fileSystemId,
+			_virtualPathHandler.GetCommonParent(
+				readOnly
+					.Select( ro => ro.Key )
+					.Union(
+						readWrite
+							.Select( rw => rw.Key )
+					).ToArray()
+			)
+		);
 	}
 
 	Task<FileIdentifier> IFileSystem.CreateFileAsync(
@@ -85,7 +93,7 @@ internal sealed class VirtualFileSystem : IFileSystem {
 		if( lmfs.Count == 1 ) {
 			MappedFileSystem<IFileSystem> mfs = lmfs[ 0 ];
 			if( !mfs.PathMapper.TryMapFromVirtual(
-				folderIdentifier.FolderId,
+				folderIdentifier,
 				out FolderIdentifier mappedFolderIdentifier
 			) ) {
 				throw new InvalidPathException();
@@ -109,7 +117,7 @@ internal sealed class VirtualFileSystem : IFileSystem {
 		if( lmfs.Count == 1 ) {
 			MappedFileSystem<IFileSystem> mfs = lmfs[ 0 ];
 			if( !mfs.PathMapper.TryMapFromVirtual(
-				folderIdentifier.FolderId,
+				folderIdentifier,
 				out FolderIdentifier mappedFolderIdentifier
 			) ) {
 				throw new InvalidPathException();
@@ -121,12 +129,12 @@ internal sealed class VirtualFileSystem : IFileSystem {
 			);
 			if( !mfs.PathMapper.TryMapToVirtual(
 				newFolderIdentifier,
-				out FolderId virtualFolderId
+				out FolderIdentifier virtualFolderIdentifier
 			) ) {
 				throw new InvalidPathException();
 			}
 
-			return new FolderIdentifier( _fileSystemId, virtualFolderId );
+			return virtualFolderIdentifier;
 		}
 		// There isn't a file system mounted at that path, so nothing to do
 		throw new InvalidPathException();
@@ -139,7 +147,7 @@ internal sealed class VirtualFileSystem : IFileSystem {
 		if( lmfs.Count == 1 ) {
 			MappedFileSystem<IFileSystem> mfs = lmfs[ 0 ];
 			if( !mfs.PathMapper.TryMapFromVirtual(
-				folderIdentifier.FolderId,
+				folderIdentifier,
 				out FolderIdentifier mappedFolderIdentifier
 			) ) {
 				throw new InvalidPathException();
@@ -158,11 +166,11 @@ internal sealed class VirtualFileSystem : IFileSystem {
 		Func<Stream, CancellationToken, Task> contentReader,
 		CancellationToken cancellationToken
 	) {
-		List<MappedFileSystem<IFileSystem>> lmfs = GetReadWrite( fileIdentifier.FileId );
+		List<MappedFileSystem<IFileSystem>> lmfs = GetReadWrite( fileIdentifier );
 		if( lmfs.Count == 1 ) {
 			MappedFileSystem<IFileSystem> mfs = lmfs[ 0 ];
 			if( !mfs.PathMapper.TryMapFromVirtual(
-				fileIdentifier.FileId,
+				fileIdentifier,
 				out FileIdentifier mappedFileIdentifier
 			) ) {
 				throw new InvalidPathException();
@@ -181,11 +189,11 @@ internal sealed class VirtualFileSystem : IFileSystem {
 	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
 		FolderIdentifier folderIdentifier
 	) {
-		List<MappedFileSystem<IReadOnlyFileSystem>> lmfs = GetReadOnly( folderIdentifier.FolderId );
+		List<MappedFileSystem<IReadOnlyFileSystem>> lmfs = GetReadOnly( folderIdentifier );
 		if( lmfs.Count == 1 ) {
 			MappedFileSystem<IReadOnlyFileSystem> mfs = lmfs[ 0 ];
 			if( !mfs.PathMapper.TryMapFromVirtual(
-				folderIdentifier.FolderId,
+				folderIdentifier,
 				out FolderIdentifier mappedFolderIdentifier
 			) ) {
 				throw new InvalidPathException();
@@ -198,18 +206,46 @@ internal sealed class VirtualFileSystem : IFileSystem {
 			foreach( FileIdentifier fileIdentifier in fileIdentifiers ) {
 				if( !mfs.PathMapper.TryMapToVirtual(
 					fileIdentifier,
-					out FileId virtualFileId
+					out FileIdentifier virtualFileIdentifier
 				) ) {
 					throw new InvalidPathException();
 				}
-				yield return new FileIdentifier( _fileSystemId, virtualFileId );
+				yield return virtualFileIdentifier;
 			}
 		}
 		// There isn't a file system mounted at that path, so nothing to do
 	}
 
 	IEnumerable<FolderIdentifier> IReadOnlyFileSystem.GetFolderIdentifiers() {
-		return ( this as IReadOnlyFileSystem ).GetFolderIdentifiers( _root );
+		List<MappedFileSystem<IReadOnlyFileSystem>> lmfs = GetReadOnly( _root );
+		if( lmfs.Count == 1 ) {
+			MappedFileSystem<IReadOnlyFileSystem> mfs = lmfs[ 0 ];
+			if( !mfs.PathMapper.TryMapFromVirtual(
+				_root,
+				out FolderIdentifier mappedFolderIdentifier
+			) ) {
+				throw new InvalidPathException();
+			}
+
+			IEnumerable<FolderIdentifier> folderIdentifiers = mfs.FileSystem.GetFolderIdentifiers(
+				mappedFolderIdentifier
+			);
+
+			foreach( FolderIdentifier folderIdentifier in folderIdentifiers ) {
+				if( !mfs.PathMapper.TryMapToVirtual(
+					folderIdentifier,
+					out FolderIdentifier virtualFolderIdentifier
+				) ) {
+					throw new InvalidPathException();
+				}
+				yield return virtualFolderIdentifier;
+			}
+			yield break;
+		}
+		IEnumerable<FolderIdentifier> fids = lmfs.Select( mfs => new FolderIdentifier( _fileSystemId, mfs.VirtualRoot ) );
+		foreach( FolderIdentifier fid in fids ) {
+			yield return fid;
+		}
 	}
 
 	IEnumerable<FolderIdentifier> IReadOnlyFileSystem.GetFolderIdentifiers(
@@ -219,7 +255,7 @@ internal sealed class VirtualFileSystem : IFileSystem {
 		if( lmfs.Count == 1 ) {
 			MappedFileSystem<IFileSystem> mfs = lmfs[ 0 ];
 			if( !mfs.PathMapper.TryMapFromVirtual(
-				folderIdentifier.FolderId,
+				folderIdentifier,
 				out FolderIdentifier mappedFolderIdentifier
 			) ) {
 				throw new InvalidPathException();
@@ -229,30 +265,18 @@ internal sealed class VirtualFileSystem : IFileSystem {
 			foreach( FolderIdentifier folder in folderIdentifiers ) {
 				if( !mfs.PathMapper.TryMapToVirtual(
 					folder,
-					out FolderId virtualFolderId
+					out FolderIdentifier virtualFolderIdentifier
 				) ) {
 					throw new InvalidPathException();
 				}
-				yield return new FolderIdentifier( _fileSystemId, virtualFolderId );
+				yield return virtualFolderIdentifier;
 			}
 			yield break;
 		}
-		Node? root = _tree.Find( folderIdentifier.FolderId.AsSpan() );
-		if (root is null) {
-			yield break;
-		}
-		foreach ( Node child in root.Children ) {
-			yield return new FolderIdentifier(
-				_fileSystemId,
-				$"{folderIdentifier.FolderId}{child.Segment}{_virtualPathHandler.Separator}"
-			);
-		}
-		/*
-		IEnumerable<FolderIdentifier> fids = lmfs.Select( mfs => new FolderIdentifier( _fileSystemId, mfs.MountAtFolder ) );
-		foreach( FolderIdentifier fid in fids ) {
+		IEnumerable<FolderIdentifier> fids = lmfs.Select( mfs => new FolderIdentifier( _fileSystemId, mfs.VirtualRoot ) );
+		foreach( FolderIdentifier fid in fids) {
 			yield return fid;
 		}
-		*/
 	}
 
 	IEnumerable<char> IFileSystem.GetInvalidPathChars() {
@@ -274,37 +298,29 @@ internal sealed class VirtualFileSystem : IFileSystem {
 	FolderIdentifier IReadOnlyFileSystem.GetFolderIdentifier(
 		string folderName
 	) {
-		return ( this as IReadOnlyFileSystem ).GetFolderIdentifier(
-			_root,
-			folderName
-		);
-	}
+		if (!folderName.StartsWith(Separator)) {
+			folderName = $"{Separator}{folderName}";
+		}
+		if( !folderName.EndsWith( Separator ) ) {
+			folderName = $"{folderName}{Separator}";
+		}
 
-	FolderIdentifier IReadOnlyFileSystem.GetFolderIdentifier(
-		FolderIdentifier parentFolderIdentifier,
-		string folderName
-	) {
-		FolderId folderId = _virtualPathHandler.Combine(
-				parentFolderIdentifier.FolderId,
-				folderName,
-				_virtualPathHandler.Separator
-			);
-
-		List<MappedFileSystem<IReadOnlyFileSystem>> lmfs = GetReadOnly( folderId );
+		FolderIdentifier target = new FolderIdentifier( _fileSystemId, folderName );
+		List<MappedFileSystem<IReadOnlyFileSystem>> lmfs = GetReadOnly( target );
 		if( lmfs.Count == 1 ) {
 			// There exists a file system to handle this folder
 			MappedFileSystem<IReadOnlyFileSystem> mfs = lmfs[ 0 ];
 			if( !mfs.PathMapper.TryMapFromVirtual(
-				folderId,
+				_root,
 				out FolderIdentifier mappedFolderIdentifier
 			) ) {
 				throw new InvalidPathException();
 			}
-			return new FolderIdentifier( _fileSystemId, folderId );
+			return target;
 		}
 		// This is a pure virtual path
-		IEnumerable<FolderIdentifier> fids = lmfs.Select( mfs => new FolderIdentifier( _fileSystemId, mfs.MountAtFolder ) );
-		return fids.First( fid => fid.FolderId == folderId ) ?? throw new FolderNotFoundException();
+		IEnumerable<FolderIdentifier> fids = lmfs.Select( mfs => new FolderIdentifier( _fileSystemId, mfs.VirtualRoot ) );
+		return fids.First( fid => fid.FolderId == target.FolderId ) ?? throw new FolderNotFoundException();
 	}
 
 	private List<MappedFileSystem<IFileSystem>> GetReadWrite(
@@ -312,29 +328,29 @@ internal sealed class VirtualFileSystem : IFileSystem {
 	) {
 		Node node = _tree.Find( folderIdentifier.FolderId.AsSpan() );
 		if( !_readWrite.TryGetValue( node, out List<MappedFileSystem<IFileSystem>>? fileSystem ) ) {
-			return _unmappedRW;
+			throw new UnmappedFileSystemException();
 		}
 		return fileSystem;
 	}
 
 	private List<MappedFileSystem<IFileSystem>> GetReadWrite(
-		FileId fileId
+		FileIdentifier fileIdentifier
 	) {
-		ReadOnlySpan<char> path = fileId.AsSpan();
-		ReadOnlySpan<char> virtualPath = path[ ..path.LastIndexOf( _virtualPathHandler.Separator ) ];
+		ReadOnlySpan<char> path = fileIdentifier.FileId.AsSpan();
+		ReadOnlySpan<char> virtualPath = path[ ..path.LastIndexOf( Separator ) ];
 		Node node = _tree.Find( virtualPath );
 		if( !_readWrite.TryGetValue( node, out List<MappedFileSystem<IFileSystem>>? fileSystem ) ) {
-			return _unmappedRW;
+			throw new UnmappedFileSystemException();
 		}
 		return fileSystem;
 	}
 
 	private List<MappedFileSystem<IReadOnlyFileSystem>> GetReadOnly(
-		FolderId folderId
+		FolderIdentifier folderIdentifier
 	) {
-		Node node = _tree.Find( folderId.AsSpan() );
+		Node node = _tree.Find( folderIdentifier.FolderId.AsSpan() );
 		if( !_readOnly.TryGetValue( node, out List<MappedFileSystem<IReadOnlyFileSystem>>? fileSystem ) ) {
-			return _unmappedRO;
+			throw new UnmappedFileSystemException();
 		}
 		return fileSystem;
 	}

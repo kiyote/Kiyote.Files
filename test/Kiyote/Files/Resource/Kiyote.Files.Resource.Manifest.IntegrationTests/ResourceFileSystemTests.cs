@@ -38,20 +38,33 @@ public class ResourceFileSystemTests {
 	}
 
 	[Test]
-	public void GetFolderIds_RootFolder_OneFolderReturned() {
-		IEnumerable<FolderIdentifier> folders = _fileSystem.GetFolderIdentifiers();
-
-		Assert.That( folders.Count(), Is.EqualTo( 1 ) );
+	public void GetFolderIdentifier_BadFolder_ThrowsFolderNotFoundException() {
+		_ = Assert.Throws<FolderNotFoundException>( () => _fileSystem.GetFolderIdentifier( "BadFolder" ) );
 	}
 
 	[Test]
-	public void GetFolderIds_ResourcesFolder_OneFolderReturned() {
-		IEnumerable<FolderIdentifier> folderIdentifiers = _fileSystem.GetFolderIdentifiers();
+	public void GetFolderIdentifier_GoodFolder_ReturnsOneFolderIdentifier() {
+		FolderIdentifier folder = _fileSystem.GetFolderIdentifier( "Folder" );
+
+		Assert.That( folder.FolderId, Is.EqualTo( $"{Path.DirectorySeparatorChar}Folder{Path.DirectorySeparatorChar}" ) );
+	}
+
+	[Test]
+	public void GetFolderIdentifiers_RootFolder_OneFolderReturned() {
+		List<FolderIdentifier> folders = _fileSystem.GetFolderIdentifiers().ToList();
+
+		Assert.That( folders, Has.Exactly( 1 ).Items );
+	}
+
+	[Test]
+	public void GetFolderIdentifiers_ResourcesFolder_OneFolderReturned() {
+		List<FolderIdentifier> folderIdentifiers = _fileSystem.GetFolderIdentifiers().ToList();
 		Assert.That( folderIdentifiers.Count, Is.EqualTo( 1 ), "Unable to get folder identifiers for resource assembly root." );
 
 		FolderIdentifier folderIdentifier = folderIdentifiers.First();
-		IEnumerable<FolderIdentifier> folders = _fileSystem.GetFolderIdentifiers( folderIdentifier );
+		List<FolderIdentifier> folders = _fileSystem.GetFolderIdentifiers( folderIdentifier ).ToList();
 
-		Assert.That( folders.Count(), Is.EqualTo( 0 ) );
+		Assert.That( folders.Count, Is.EqualTo( 1 ) );
+		Assert.That( folders.ElementAt( 0 ).FolderId, Is.EqualTo( $"{Path.DirectorySeparatorChar}Folder{Path.DirectorySeparatorChar}SubFolder{Path.DirectorySeparatorChar}" ) );
 	}
 }

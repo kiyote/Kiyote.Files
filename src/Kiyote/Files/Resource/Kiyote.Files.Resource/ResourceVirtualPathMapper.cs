@@ -6,81 +6,75 @@ internal sealed class ResourceVirtualPathMapper : IVirtualPathMapper {
 
 	private readonly ResourceFileSystem _fileSystem;
 	private readonly string _virtualRoot;
+	private readonly char _virtualSeparator;
 
 	public ResourceVirtualPathMapper(
 		ResourceFileSystem resourceFileSystem,
-		string virtualRoot
+		string virtualRoot,
+		char virtualSeparator
 	) {
 		_fileSystem = resourceFileSystem;
 		_virtualRoot = virtualRoot;
+		_virtualSeparator = virtualSeparator;
 	}
 
 	bool IVirtualPathMapper.TryMapFromVirtual(
-		FileIdentifier virtualFileIdentifier,
+		FileId virtualFileId,
 		out FileIdentifier fileIdentifier
 	) {
-		if( virtualFileIdentifier.FileSystemId != _fileSystem.FileSystemId
-			|| !virtualFileIdentifier.FileId.ToString().StartsWith( _virtualRoot, StringComparison.OrdinalIgnoreCase
-		) ) {
+		if( !virtualFileId.ToString().StartsWith( _virtualRoot, StringComparison.OrdinalIgnoreCase ) ) {
 			fileIdentifier = FileIdentifier.None;
 			return false;
 		}
 		fileIdentifier = new FileIdentifier(
-			virtualFileIdentifier.FileSystemId,
-			virtualFileIdentifier.FileId.AsSpan()[ _virtualRoot.Length.. ].ToString().Replace( '/', _fileSystem.Separator )
+			_fileSystem.FileSystemId,
+			virtualFileId.AsSpan()[ _virtualRoot.Length.. ].ToString().Replace( _virtualSeparator, _fileSystem.Separator )
 		);
 		return true;
 	}
 
 	bool IVirtualPathMapper.TryMapFromVirtual(
-		FolderIdentifier virtualFolderIdentifier,
+		FolderId virtualFolderId,
 		out FolderIdentifier folderIdentifier
 	) {
-		if( virtualFolderIdentifier.FileSystemId != _fileSystem.FileSystemId
-			|| !virtualFolderIdentifier.FolderId.ToString().StartsWith( _virtualRoot, StringComparison.OrdinalIgnoreCase ) ) {
+		if( !virtualFolderId.ToString().StartsWith( _virtualRoot, StringComparison.OrdinalIgnoreCase ) ) {
 			folderIdentifier = FolderIdentifier.None;
 			return false;
 		}
 		folderIdentifier = new FolderIdentifier(
-			virtualFolderIdentifier.FileSystemId,
-			virtualFolderIdentifier.FolderId.AsSpan()[ _virtualRoot.Length.. ].ToString().Replace( '/', _fileSystem.Separator )
+			_fileSystem.FileSystemId,
+			virtualFolderId.AsSpan()[ _virtualRoot.Length.. ].ToString().Replace( _virtualSeparator, _fileSystem.Separator )
 		);
 		return true;
 	}
 
 	bool IVirtualPathMapper.TryMapToVirtual(
 		FileIdentifier fileIdentifier,
-		out FileIdentifier virtualFileIdentifier
+		out FileId virtualFileId
 	) {
 		if( fileIdentifier.FileSystemId != _fileSystem.FileSystemId ) {
-			virtualFileIdentifier = FileIdentifier.None;
+			virtualFileId = FileId.None;
 			return false;
 		}
 
 		string physicalPath = fileIdentifier.FileId;
-		string virtualPath = physicalPath.Replace( _fileSystem.Separator, '/' );
-		virtualFileIdentifier = new FileIdentifier(
-			fileIdentifier.FileSystemId,
-			$"{_virtualRoot}/{virtualPath}"
-		);
+		string virtualPath = physicalPath.Replace( _fileSystem.Separator, _virtualSeparator );
+		virtualFileId = $"{_virtualRoot}{virtualPath}";
 		return true;
 	}
 
 	bool IVirtualPathMapper.TryMapToVirtual(
 		FolderIdentifier folderIdentifier,
-		out FolderIdentifier virtualFolderIdentifier
+		out FolderId virtualFolderId
 	) {
 		if( folderIdentifier.FileSystemId != _fileSystem.FileSystemId ) {
-			virtualFolderIdentifier = FolderIdentifier.None;
+			virtualFolderId = FolderId.None;
 			return false;
 		}
 
 		string physicalPath = folderIdentifier.FolderId;
-		string virtualPath = physicalPath.Replace( _fileSystem.Separator, '/' );
-		virtualFolderIdentifier = new FolderIdentifier(
-			folderIdentifier.FileSystemId,
-			$"{_virtualRoot}/{virtualPath}"
-		);
+		string virtualPath = physicalPath.Replace( _fileSystem.Separator, _virtualSeparator );
+		virtualFolderId = $"{_virtualRoot}{virtualPath}";
 		return true;
 	}
 }

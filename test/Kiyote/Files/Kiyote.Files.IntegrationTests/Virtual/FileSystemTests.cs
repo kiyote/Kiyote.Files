@@ -40,9 +40,11 @@ public sealed class FileSystemTests {
 	[Test]
 	public void GetFolderIds_TwoRootsNoChildFolders_NoFoldersReturned() {
 		CreateTwoRootedFileSystem();
-		IEnumerable<FolderIdentifier> folderIdentifiers = _fileSystem!.GetFolderIdentifiers();
+		List<FolderIdentifier> folderIdentifiers = _fileSystem!.GetFolderIdentifiers().ToList();
 
 		Assert.That( folderIdentifiers.Count, Is.EqualTo( 2 ) );
+		Assert.That( folderIdentifiers.ElementAt( 0 ).FolderId, Is.EqualTo( "/root1/" ) );
+		Assert.That( folderIdentifiers.ElementAt( 1 ).FolderId, Is.EqualTo( "/root2/" ) );
 	}
 
 	[Test]
@@ -81,10 +83,10 @@ public sealed class FileSystemTests {
 		_ = collection
 			.AddDiskFileSystem()
 			.BuildFileSystem(
-				( IServiceProvider services, IFileSystemBuilder<FS.Test> builder ) => {
+				( IServiceProvider services, IVirtualPathHandler virtualPathHandler, IFileSystemBuilder<FS.Test> builder ) => {
 					_ = builder.AddReadWriteDisk(
 						services,
-						"/",
+						virtualPathHandler.Create(),
 						_folder1
 					);
 				}
@@ -100,15 +102,15 @@ public sealed class FileSystemTests {
 		_ = collection
 			.AddDiskFileSystem()
 			.BuildFileSystem(
-				( IServiceProvider services, IFileSystemBuilder<FS.Test> builder ) => {
+				( IServiceProvider services, IVirtualPathHandler virtualPathHandler, IFileSystemBuilder<FS.Test> builder ) => {
 					_ = builder
 						.AddReadWriteDisk(
 							services,
-							"/root1",
+							virtualPathHandler.Create( "root1" ),
 							_folder1
 						).AddReadWriteDisk(
 							services,
-							"/root2",
+							virtualPathHandler.Create( "root2" ),
 							_folder2
 						);
 				}

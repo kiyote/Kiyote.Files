@@ -112,7 +112,8 @@ public static class ExtensionMethods {
 		);
 		DiskVirtualPathMapper pathMapper = new DiskVirtualPathMapper(
 			fileSystem,
-			virtualRoot
+			virtualRoot,
+			builder.VirtualPathHandler.Separator
 		);
 		builder.AddReadWrite(
 			virtualRoot,

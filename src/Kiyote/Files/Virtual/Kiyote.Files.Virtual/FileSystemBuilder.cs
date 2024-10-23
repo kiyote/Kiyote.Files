@@ -3,6 +3,7 @@
 internal sealed class FileSystemBuilder<T> : IFileSystemBuilder<T> where T : IFileSystemIdentifier {
 
 	private readonly FileSystemId _fileSystemId;
+	private readonly IVirtualPathHandler _virtualPathHandler;
 
 	private readonly Dictionary<FolderId, MappedFileSystem<IFileSystem>> _readWrite;
 	private readonly Dictionary<FolderId, MappedFileSystem<IReadOnlyFileSystem>> _readOnly;
@@ -11,18 +12,16 @@ internal sealed class FileSystemBuilder<T> : IFileSystemBuilder<T> where T : IFi
 		IVirtualPathHandler virtualPathHandler,
 		FileSystemId fileSystemId
 	) {
-		VirtualPathHandler = virtualPathHandler;
+		_virtualPathHandler = virtualPathHandler;
 		_fileSystemId = fileSystemId;
 		_readWrite = [];
 		_readOnly = [];
 	}
 
-	public IVirtualPathHandler VirtualPathHandler { get; }
-
 	public IFileSystem<T> Build() {
 		return new FileSystemAdapter<T>(
 			new VirtualFileSystem(
-				VirtualPathHandler,
+				_virtualPathHandler,
 				_fileSystemId,
 				_readOnly,
 				_readWrite

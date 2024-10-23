@@ -4,7 +4,6 @@ using System.Text;
 namespace Kiyote.Files.Virtual;
 
 internal sealed class VirtualPathHandler : IVirtualPathHandler {
-	public char Separator => '/';
 
 	FolderId IVirtualPathHandler.GetCommonParent(
 		FolderId[] virtualPaths
@@ -20,7 +19,7 @@ internal sealed class VirtualPathHandler : IVirtualPathHandler {
 		Dictionary<string, string[]> pathSegments = [];
 
 		foreach( FolderId virtualPath in virtualPaths ) {
-			string[] segments = virtualPath.ToString().Split( Separator, StringSplitOptions.RemoveEmptyEntries );
+			string[] segments = virtualPath.ToString().Split( VirtualFileSystem.Separator, StringSplitOptions.RemoveEmptyEntries );
 			pathSegments[ virtualPath ] = segments;
 		}
 
@@ -45,11 +44,11 @@ internal sealed class VirtualPathHandler : IVirtualPathHandler {
 			if( !allMatch
 				|| i >= shortest.Length
 			) {
-				StringBuilder result = new StringBuilder( Separator.ToString() );
+				StringBuilder result = new StringBuilder( VirtualFileSystem.Separator.ToString() );
 				for( int j = 0; j < i; j++ ) {
 					_ = result
 						.Append( shortest[ j ] )
-						.Append( Separator );
+						.Append( VirtualFileSystem.Separator );
 				}
 				return result.ToString();
 			}
@@ -66,38 +65,5 @@ internal sealed class VirtualPathHandler : IVirtualPathHandler {
 			ignoreCase: true,
 			CultureInfo.InvariantCulture
 		);
-	}
-
-	string IVirtualPathHandler.Combine(
-		FolderId folderId,
-		string folderName,
-		char separator
-	) {
-		if( folderName.StartsWith( separator ) ) {
-			throw new InvalidPathException();
-		}
-		string path = $"{folderId}{folderName}";
-		if( !path.EndsWith( separator ) ) {
-			return $"{path}{separator}";
-		} else {
-			return path;
-		}
-	}
-
-	FolderId IVirtualPathHandler.Create(
-		string path
-	) {
-		path = path.Trim();
-		if (string.IsNullOrWhiteSpace( path )) {
-			return $"{Separator}";
-		}
-		string[] segments = path.Split( Separator );
-		if( segments.Length == 0 ) {
-			return Separator.ToString();
-		} else if( segments.Length == 1 ) {
-			return $"{Separator}{segments[ 0 ]}{Separator}";
-		} else {
-			return $"{Separator}{segments.Aggregate( ( c, n ) => $"{c}{Separator}{n}" )}{Separator}";
-		}
 	}
 }

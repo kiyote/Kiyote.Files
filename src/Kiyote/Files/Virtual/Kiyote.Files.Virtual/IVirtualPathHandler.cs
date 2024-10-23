@@ -2,8 +2,6 @@
 
 public interface IVirtualPathHandler {
 
-	char Separator { get; }
-
 	FolderId GetCommonParent(
 		FolderId[] virtualPaths
 	);
@@ -13,13 +11,4 @@ public interface IVirtualPathHandler {
 		FolderId baseFolderId
 	);
 
-	string Combine(
-		FolderId folderId,
-		string folderName,
-		char separator
-	);
-
-	FolderId Create(
-		string path = ""
-	);
 }

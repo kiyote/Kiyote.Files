@@ -12,6 +12,7 @@ public sealed class DiskVirtualPathMapperTests {
 	public const string VirtualRoot = @"/root/";
 	public const string PhysicalRoot = @"DRIVE:\PATH";
 	public const char Separator = '\\';
+	public const char VirtualSeparator = '/';
 	public static readonly char[] InvalidPathChars = [ '/', '\\' ];
 	public static readonly char[] InvalidFileNameChars = [ '/', '\\', ':' ];
 
@@ -48,7 +49,8 @@ public sealed class DiskVirtualPathMapperTests {
 		);
 		_pathMapper = new DiskVirtualPathMapper(
 			fileSystem,
-			VirtualRoot
+			VirtualRoot,
+			VirtualSeparator
 		);
 	}
 
@@ -60,10 +62,8 @@ public sealed class DiskVirtualPathMapperTests {
 
 	[Test]
 	public void TryMapFromVirtual_ValidFolderId_Success() {
-		FolderIdentifier folderIdentifier = new FolderIdentifier( "Test", VirtualRoot );
-
 		bool result = _pathMapper.TryMapFromVirtual(
-			folderIdentifier,
+			VirtualRoot,
 			out FolderIdentifier mappedFolderIdentifier
 		);
 

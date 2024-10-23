@@ -9,7 +9,7 @@ public static class ExtensionMethods {
 
 	public static IServiceCollection BuildFileSystem<T>(
 		this IServiceCollection services,
-		Action<IServiceProvider, IVirtualPathHandler, IFileSystemBuilder<T>> action
+		Action<IServiceProvider, IFileSystemBuilder<T>> action
 	) where T: IFileSystemIdentifier {
 		services.TryAddSingleton<IVirtualPathHandler, VirtualPathHandler>();
 		_ = services.AddSingleton(
@@ -20,7 +20,7 @@ public static class ExtensionMethods {
 					virtualPathHandler,
 					identifier.FileSystemId
 				);
-				action( serviceProvider, virtualPathHandler, builder );
+				action( serviceProvider, builder );
 				return builder.Build();
 			}
 		);

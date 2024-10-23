@@ -24,8 +24,9 @@ public sealed class VirtualResourceFileSystemTests {
 	public void SetUp() {
 		IServiceCollection services = new ServiceCollection();
 		_ = services
-			.BuildFileSystem<FS>( ( services, builder ) => {
-				_ = builder.AddResource( services, VirtualRoot, Assembly.GetExecutingAssembly() );
+			.BuildFileSystem<FS>( ( services, virtualPathHandler, builder ) => {
+				FolderId root = virtualPathHandler.Create( VirtualRoot );
+				_ = builder.AddResource( services, root, Assembly.GetExecutingAssembly() );
 			} );
 
 		IServiceProvider provider = services.BuildServiceProvider();
@@ -40,24 +41,28 @@ public sealed class VirtualResourceFileSystemTests {
 	}
 
 	[Test]
-	public void GetFolderIdentifiers_Root_ReturnsNoFolders() {
+	public void GetFolderIdentifiers_Root_ReturnsResourceFolder() {
 		IEnumerable<FolderIdentifier> folders = _fileSystem.GetFolderIdentifiers();
 
-		Assert.That( folders, Is.Empty );
+		Assert.That( folders.Count, Is.EqualTo( 1 ) );
 	}
 
 	[Test]
-	public void GetFileIdentifiers_RootFolder_FilesReturned() {
+	public void GetFileIdentifiers_RootFolder_NoFilesReturned() {
 		IEnumerable<FileIdentifier> files = _fileSystem.GetFileIdentifiers( _fileSystem.GetRoot() );
 
-		Assert.That( files.Count(), Is.EqualTo( 2 ) );
+		Assert.That( files.Count(), Is.EqualTo( 0 ) );
 	}
 
-	/*
 	[Test]
-	public void GetFolderIdentifier_ResourceFolder_FolderReturned() {
-		Assert.DoesNotThrow( () => _fileSystem.GetFolderIdentifier( VirtualRoot ) );
+	public void GetFileIdentifiers_ResourceFolder_FilesReturned() {
+		FolderIdentifier resourceFolder = _fileSystem.GetFolderIdentifier( VirtualRoot );
+		List<FileIdentifier> files = _fileSystem.GetFileIdentifiers( resourceFolder ).ToList();
+
+		Assert.That( files.Count, Is.EqualTo( 2 ) );
+		Assert.That( files, Is.All.Matches<FileIdentifier>( fid => fid.FileId.ToString().StartsWith( "/Resource/", StringComparison.OrdinalIgnoreCase ) ) );
+		Assert.That( files, Has.One.Matches<FileIdentifier>( fid => fid.FileId.ToString().EndsWith( "TestResources.item.txt", StringComparison.OrdinalIgnoreCase ) ) );
+		Assert.That( files, Has.One.Matches<FileIdentifier>( fid => fid.FileId.ToString().EndsWith( "TestResources.Folder.subitem.txt", StringComparison.OrdinalIgnoreCase ) ) );
 	}
-	*/
 }
 

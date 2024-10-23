@@ -2,8 +2,6 @@
 
 public interface IFileSystemBuilder<T> {
 
-	public IVirtualPathHandler VirtualPathHandler { get; }
-
 	void AddReadWrite(
 		FolderId virtualRoot,
 		IFileSystem fileSystem,

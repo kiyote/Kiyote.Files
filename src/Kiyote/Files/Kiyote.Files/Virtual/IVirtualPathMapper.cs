@@ -3,23 +3,23 @@
 public interface IVirtualPathMapper {
 
 	bool TryMapFromVirtual(
-		FileIdentifier virtualFileIdentifier,
+		FileId virtualFileId,
 		out FileIdentifier fileIdentifier
 	);
 
 	bool TryMapToVirtual(
 		FileIdentifier fileIdentifier,
-		out FileIdentifier virtualFileIdentifier
+		out FileId virtualFileId
 	);
 
 	bool TryMapFromVirtual(
-		FolderIdentifier virtualFolderIdentifier,
+		FolderId virtualFolderId,
 		out FolderIdentifier folderIdentifier
 	);
 
 	bool TryMapToVirtual(
 		FolderIdentifier folderIdentifier,
-		out FolderIdentifier virtualFolderIdentifier
+		out FolderId virtualFolderId
 	);
 
 }

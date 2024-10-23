@@ -93,4 +93,14 @@ public sealed class FileSystemAdapter<T> : IFileSystem<T> where T : IFileSystemI
 	) {
 		return _fileSystem.GetFolderIdentifier( folderName );
 	}
+
+	FolderIdentifier IReadOnlyFileSystem.GetFolderIdentifier(
+		FolderIdentifier parentFolderIdentifier,
+		string folderName
+	) {
+		return _fileSystem.GetFolderIdentifier(
+			parentFolderIdentifier,
+			folderName
+		);
+	}
 }

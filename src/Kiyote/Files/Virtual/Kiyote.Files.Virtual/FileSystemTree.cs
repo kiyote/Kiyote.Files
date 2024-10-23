@@ -21,12 +21,7 @@ internal sealed class Node {
 
 internal sealed class FileSystemTree {
 
-	private readonly char _separator;
-
-	public FileSystemTree(
-		char separator
-	) {
-		_separator = separator;
+	public FileSystemTree() {
 		Root = new Node();
 	}
 
@@ -35,22 +30,8 @@ internal sealed class FileSystemTree {
 	public Node Insert(
 		string path
 	) {
-		return Insert( path.AsSpan() );
-	}
-
-	public void Insert(
-		IEnumerable<string> paths
-	) {
-		foreach (var path in paths) {
-			_ = Insert( path.AsSpan() );
-		}
-	}
-
-	public Node Insert(
-		ReadOnlySpan<char> path
-	) {
 		int start = 1;
-		int end = path[ start.. ].IndexOf( _separator ) + 1;
+		int end = path.AsSpan()[ start.. ].IndexOf( VirtualFileSystem.Separator ) + 1;
 
 		if( end <= start ) {
 			return Root;
@@ -58,11 +39,11 @@ internal sealed class FileSystemTree {
 
 		Node current = Root;
 		while( true ) {
-			ReadOnlySpan<char> segment = path[ start..end ];
+			ReadOnlySpan<char> segment = path.AsSpan()[ start..end ];
 			current = GetOrCreateNode( current, segment );
 
 			start = end + 1;
-			end = path[ start.. ].IndexOf( _separator );
+			end = path.AsSpan()[ start.. ].IndexOf( VirtualFileSystem.Separator );
 			if( end == -1 ) {
 				break;
 			}
@@ -82,7 +63,7 @@ internal sealed class FileSystemTree {
 		ReadOnlySpan<char> path
 	) {
 		int start = 1;
-		int end = path[ start.. ].IndexOf( _separator ) + 1;
+		int end = path[ start.. ].IndexOf( VirtualFileSystem.Separator ) + 1;
 
 		if( end <= start ) {
 			return Root;
@@ -98,7 +79,7 @@ internal sealed class FileSystemTree {
 			}
 			current = child;
 			start = end + 1;
-			end = path[ start.. ].IndexOf( _separator );
+			end = path[ start.. ].IndexOf( VirtualFileSystem.Separator );
 			if( end == -1 ) {
 				break;
 			}

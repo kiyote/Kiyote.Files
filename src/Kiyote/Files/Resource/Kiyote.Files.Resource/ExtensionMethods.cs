@@ -69,7 +69,8 @@ public static class ExtensionMethods {
 		);
 		ResourceVirtualPathMapper pathMapper = new ResourceVirtualPathMapper(
 			fileSystem,
-			virtualRoot
+			virtualRoot,
+			builder.VirtualPathHandler.Separator
 		);
 		builder.AddReadOnly(
 			virtualRoot,

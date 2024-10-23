@@ -1,7 +1,7 @@
 ﻿namespace Kiyote.Files.Virtual;
 
 public sealed record MappedFileSystem<T>(
-	FolderId MountAtFolder,
+	FolderId VirtualRoot,
 	IVirtualPathMapper PathMapper,
 	T FileSystem
 );

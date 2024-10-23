@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Kiyote.Files.Virtual.IntegrationTests;
+namespace Kiyote.Files.Virtual.UnitTests;
 
 [TestFixture]
 [ExcludeFromCodeCoverage]
@@ -10,7 +10,7 @@ public sealed class FileSystemTreeTests {
 
 	[SetUp]
 	public void SetUp() {
-		_tree = new FileSystemTree();
+		_tree = new FileSystemTree( '/' );
 	}
 
 	[Test]
@@ -67,5 +67,26 @@ public sealed class FileSystemTreeTests {
 		Node root1 = _tree.Find( path2 );
 
 		Assert.That( root1.Segment, Is.EqualTo( "root1" ) );
+	}
+
+	[Test]
+	public void GetNode_BuiltTree_NodeWithChildrenReturned() {
+		string path1 = @"/root1/";
+		string path2 = @"/root1/child1/";
+		string path3 = @"/root2/";
+		string path4 = @"/root2/child2/";
+
+		_tree.Insert( [path1, path2, path3, path4 ] );
+
+		Node root = _tree.Find( "/" );
+
+		Assert.That( string.IsNullOrEmpty( root.Segment ) );
+		Assert.That( root.Children.Count, Is.EqualTo( 2 ) );
+		Assert.That( root.Children.ElementAt( 0 ).Segment, Is.EqualTo( "root1" ) );
+		Assert.That( root.Children.ElementAt( 0 ).Children.Count, Is.EqualTo( 1 ) );
+		Assert.That( root.Children.ElementAt( 0 ).Children.ElementAt( 0 ).Segment, Is.EqualTo( "child1" ) );
+		Assert.That( root.Children.ElementAt( 1 ).Segment, Is.EqualTo( "root2" ) );
+		Assert.That( root.Children.ElementAt( 1 ).Children.Count, Is.EqualTo( 1 ) );
+		Assert.That( root.Children.ElementAt( 1 ).Children.ElementAt( 0 ).Segment, Is.EqualTo( "child2" ) );
 	}
 }

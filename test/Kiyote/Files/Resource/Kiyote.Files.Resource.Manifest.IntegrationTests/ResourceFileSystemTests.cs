@@ -46,7 +46,7 @@ public class ResourceFileSystemTests {
 	public void GetFolderIdentifier_GoodFolder_ReturnsOneFolderIdentifier() {
 		FolderIdentifier folder = _fileSystem.GetFolderIdentifier( "Folder" );
 
-		Assert.That( folder.FolderId, Is.EqualTo( "\\Folder\\" ) );
+		Assert.That( folder.FolderId, Is.EqualTo( $"{Path.DirectorySeparatorChar}Folder{Path.DirectorySeparatorChar}" ) );
 	}
 
 	[Test]
@@ -65,16 +65,6 @@ public class ResourceFileSystemTests {
 		List<FolderIdentifier> folders = _fileSystem.GetFolderIdentifiers( folderIdentifier ).ToList();
 
 		Assert.That( folders.Count, Is.EqualTo( 1 ) );
-		Assert.That( folders.ElementAt( 0 ).FolderId, Is.EqualTo( "\\Folder\\SubFolder\\" ) );
+		Assert.That( folders.ElementAt( 0 ).FolderId, Is.EqualTo( $"{Path.DirectorySeparatorChar}Folder{Path.DirectorySeparatorChar}SubFolder{Path.DirectorySeparatorChar}" ) );
 	}
-
-	/*
-	[Test]
-	public void GetFileIds_RootFolder_OneFileReturned() {
-		FolderIdentifier root = _fileSystem.GetRoot();
-		List<FileIdentifier> fileIds = _fileSystem.GetFileIdentifiers( root ).ToList();
-
-		Assert.That( fileIds, Has.Exactly( 1 ).Items );
-	}
-	*/
 }

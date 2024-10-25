@@ -53,6 +53,6 @@ public sealed class DiskFileSystemTests {
 
 	[Test]
 	public void GetRootId_ValidReader_RootReturned() {
-		Assert.That( _files.GetRoot().FolderId, Is.EqualTo( Root ) );
+		Assert.That( _files.GetRoot().FolderId.ToString(), Is.EqualTo( Path.DirectorySeparatorChar.ToString() ) );
 	}
 }

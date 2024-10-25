@@ -11,6 +11,18 @@ public sealed class FileSystemAdapter<T> : IFileSystem<T> where T : IFileSystemI
 	}
 
 	Task<FileIdentifier> IFileSystem.CreateFileAsync(
+		string fileName,
+		Func<Stream, CancellationToken, Task> contentWriter,
+		CancellationToken cancellationToken
+	) {
+		return _fileSystem.CreateFileAsync(
+			fileName,
+			contentWriter,
+			cancellationToken
+		);
+	}
+
+	Task<FileIdentifier> IFileSystem.CreateFileAsync(
 		FolderIdentifier folderIdentifier,
 		string fileName,
 		Func<Stream, CancellationToken, Task> contentWriter,
@@ -52,6 +64,11 @@ public sealed class FileSystemAdapter<T> : IFileSystem<T> where T : IFileSystemI
 			contentReader,
 			cancellationToken
 		);
+	}
+
+	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
+	) {
+		return _fileSystem.GetFileIdentifiers();
 	}
 
 	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
@@ -101,6 +118,22 @@ public sealed class FileSystemAdapter<T> : IFileSystem<T> where T : IFileSystemI
 		return _fileSystem.GetFolderIdentifier(
 			parentFolderIdentifier,
 			folderName
+		);
+	}
+
+	FileIdentifier IReadOnlyFileSystem.GetFileIdentifier(
+		string fileName
+	) {
+		return _fileSystem.GetFileIdentifier( fileName );
+	}
+
+	FileIdentifier IReadOnlyFileSystem.GetFileIdentifier(
+		FolderIdentifier folderIdentifier,
+		string fileName
+	) {
+		return _fileSystem.GetFileIdentifier(
+			folderIdentifier,
+			fileName
 		);
 	}
 }

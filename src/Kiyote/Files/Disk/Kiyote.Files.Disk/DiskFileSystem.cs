@@ -19,8 +19,12 @@ internal sealed class DiskFileSystem : IFileSystem {
 	) {
 		FileSystemId = fileSystemId;
 		FileSystem = fileSystem;
+		rootPath = rootPath.Replace( Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar );
+		if (!rootPath.EndsWith(Path.DirectorySeparatorChar)) {
+			rootPath = $"{rootPath}{Path.DirectorySeparatorChar}";
+		}
 		_rootPath = rootPath;
-		_root = new FolderIdentifier( FileSystemId, rootPath );
+		_root = new FolderIdentifier( FileSystemId, FileSystem.Path.DirectorySeparatorChar.ToString() );
 		_invalidPathChars = [
 			.. FileSystem.Path.GetInvalidPathChars(),
 			FileSystem.Path.DirectorySeparatorChar,
@@ -64,6 +68,19 @@ internal sealed class DiskFileSystem : IFileSystem {
 
 	internal FileSystemId FileSystemId { get; }
 
+	Task<FileIdentifier> IFileSystem.CreateFileAsync(
+		string fileName,
+		Func<Stream, CancellationToken, Task> contentWriter,
+		CancellationToken cancellationToken
+	) {
+		return ( this as IFileSystem ).CreateFileAsync(
+			_root,
+			fileName,
+			contentWriter,
+			cancellationToken
+		);
+	}
+
 	async Task<FileIdentifier> IFileSystem.CreateFileAsync(
 		FolderIdentifier folderIdentifier,
 		string fileName,
@@ -89,7 +106,7 @@ internal sealed class DiskFileSystem : IFileSystem {
 
 			return new FileIdentifier( FileSystemId, fileId );
 		} catch( DirectoryNotFoundException ) {
-			throw new FolderNotFoundException();
+			throw new PathNotFoundException();
 		} catch( Exception ex ) {
 			throw new ContentUnavailableException( "Unable to write content.", ex );
 		}
@@ -139,6 +156,34 @@ internal sealed class DiskFileSystem : IFileSystem {
 		} catch( Exception ex ) {
 			throw new ContentUnavailableException( "Unable to open stream for file.", ex );
 		}
+	}
+
+	FileIdentifier IReadOnlyFileSystem.GetFileIdentifier(
+		string fileName
+	) {
+		return ( this as IReadOnlyFileSystem ).GetFileIdentifier(
+			_root,
+			fileName
+		);
+	}
+
+	FileIdentifier IReadOnlyFileSystem.GetFileIdentifier(
+		FolderIdentifier folderIdentifier,
+		string fileName
+	) {
+		string path = ToPhysicalPath( folderIdentifier.FolderId, fileName );
+		if( !File.Exists( path ) ) {
+			throw new PathNotFoundException();
+		}
+		return new FileIdentifier(
+			FileSystemId,
+			ToFileId( folderIdentifier.FolderId, fileName )
+		);
+	}
+
+	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
+	) {
+		return ( this as IReadOnlyFileSystem ).GetFileIdentifiers( _root );
 	}
 
 	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
@@ -211,7 +256,7 @@ internal sealed class DiskFileSystem : IFileSystem {
 				folderId
 			);
 		}
-		throw new FolderNotFoundException();
+		throw new PathNotFoundException();
 	}
 
 	private string ToPhysicalPath(
@@ -225,9 +270,20 @@ internal sealed class DiskFileSystem : IFileSystem {
 	}
 
 	private string ToPhysicalPath(
+		FolderId folderId,
+		string fileName
+	) {
+		if( folderId == _root.FolderId ) {
+			return Path.Combine( _rootPath, fileName );
+		}
+
+		return Path.Combine( _rootPath, folderId, fileName );
+	}
+
+	private string ToPhysicalPath(
 		FileId fileId
 	) {
-		return Path.Combine( _rootPath, fileId );
+		return Path.Combine( _rootPath, fileId.ToString()[ 1.. ] );
 	}
 
 	private FileId ToFileId(
@@ -235,7 +291,7 @@ internal sealed class DiskFileSystem : IFileSystem {
 		string fileName
 	) {
 		if( folderId == _root.FolderId ) {
-			return fileName;
+			return $"{folderId}{fileName}";
 		}
 		return $"{folderId}{fileName}";
 	}
@@ -245,7 +301,7 @@ internal sealed class DiskFileSystem : IFileSystem {
 		ReadOnlySpan<char> fileName
 	) {
 		if( folderId == _root.FolderId ) {
-			return $"{fileName}";
+			return $"{folderId}{fileName}";
 		}
 		return $"{folderId}{fileName}";
 	}

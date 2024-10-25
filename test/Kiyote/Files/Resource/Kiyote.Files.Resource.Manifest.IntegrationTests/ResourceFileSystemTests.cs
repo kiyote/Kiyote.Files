@@ -39,7 +39,7 @@ public class ResourceFileSystemTests {
 
 	[Test]
 	public void GetFolderIdentifier_BadFolder_ThrowsFolderNotFoundException() {
-		_ = Assert.Throws<FolderNotFoundException>( () => _fileSystem.GetFolderIdentifier( "BadFolder" ) );
+		_ = Assert.Throws<PathNotFoundException>( () => _fileSystem.GetFolderIdentifier( "BadFolder" ) );
 	}
 
 	[Test]
@@ -66,5 +66,79 @@ public class ResourceFileSystemTests {
 
 		Assert.That( folders.Count, Is.EqualTo( 1 ) );
 		Assert.That( folders.ElementAt( 0 ).FolderId, Is.EqualTo( $"{Path.DirectorySeparatorChar}Folder{Path.DirectorySeparatorChar}SubFolder{Path.DirectorySeparatorChar}" ) );
+	}
+
+	[Test]
+	public void GetFileIdentifiers_Root_Returns1File() {
+		List<FileIdentifier> fileIdentifiers = _fileSystem.GetFileIdentifiers().ToList();
+
+		Assert.That( fileIdentifiers.Count, Is.EqualTo( 1 ) );
+		Assert.That( fileIdentifiers.ElementAt( 0 ).FileId.ToString(), Is.EqualTo( @"\item.txt" ) );
+	}
+
+	[Test]
+	public void GetFileIdentifiers_Folder_Returns1File() {
+		FolderIdentifier folderIdentifier = _fileSystem.GetFolderIdentifier( "Folder" );
+		List<FileIdentifier> fileIdentifiers = _fileSystem.GetFileIdentifiers( folderIdentifier ).ToList();
+
+		Assert.That( fileIdentifiers.Count, Is.EqualTo( 1 ) );
+		Assert.That( fileIdentifiers.ElementAt( 0 ).FileId.ToString(), Is.EqualTo( @"\Folder\subitem.txt" ) );
+	}
+
+	[Test]
+	public void GetFileIdentifier_RootExistingFile_ReturnsCorrectFileIdentifier() {
+		FileIdentifier fileIdentifier = _fileSystem.GetFileIdentifier( "item.txt" );
+
+		Assert.That( fileIdentifier.FileId.ToString(), Is.EqualTo( @"\item.txt" ) );
+	}
+
+	[Test]
+	public void GetFileIdentifier_FolderExistingFile_ReturnsCorrectFileIdentifier() {
+		FolderIdentifier folderIdentifier = _fileSystem.GetFolderIdentifier( "Folder" );
+		FileIdentifier fileIdentifier = _fileSystem.GetFileIdentifier( folderIdentifier, "subitem.txt" );
+
+		Assert.That( fileIdentifier.FileId.ToString(), Is.EqualTo( @"\Folder\subitem.txt" ) );
+	}
+
+	[Test]
+	public void GetFileIdentifier_RootNonExistantFile_ThrowsPathNotFoundException() {
+		_ = Assert.Throws<PathNotFoundException>( () => _fileSystem.GetFileIdentifier( "garbage" ) );
+	}
+
+	[Test]
+	public void GetFileIdentifier_FolderNonExistantFile_ThrowsPathNotFoundException() {
+		FolderIdentifier folderIdentifier = _fileSystem.GetFolderIdentifier( "Folder" );
+		_ = Assert.Throws<PathNotFoundException>( () => _fileSystem.GetFileIdentifier( folderIdentifier, "garbage" ) );
+	}
+
+	[Test]
+	public async Task GetContentAsync_ExistingFile_ContentMatches() {
+		FileIdentifier fileIdentifier = _fileSystem.GetFileIdentifier( "item.txt" );
+
+		await _fileSystem.GetContentAsync(
+			fileIdentifier,
+			async ( stream, cancellationToken ) => {
+				TextReader reader = new StreamReader( stream );
+				string content = await reader.ReadToEndAsync( cancellationToken );
+				Assert.That( content.Trim(), Is.EqualTo( "item" ) ); // Ignore line-ending issues
+			},
+			CancellationToken.None
+		);
+	}
+
+	[Test]
+	public async Task GetContentAsync_SubFolderExistingFile_ContentMatches() {
+		FolderIdentifier folderIdentifier = _fileSystem.GetFolderIdentifier( "Folder" );
+		FileIdentifier fileIdentifier = _fileSystem.GetFileIdentifier( folderIdentifier, "subitem.txt" );
+
+		await _fileSystem.GetContentAsync(
+			fileIdentifier,
+			async ( stream, cancellationToken ) => {
+				TextReader reader = new StreamReader( stream );
+				string content = await reader.ReadToEndAsync( cancellationToken );
+				Assert.That( content.Trim(), Is.EqualTo( "subitem" ) ); // Ignore line-ending issues
+			},
+			CancellationToken.None
+		);
 	}
 }

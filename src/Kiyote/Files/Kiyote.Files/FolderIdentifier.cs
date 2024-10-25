@@ -5,4 +5,8 @@ public sealed record FolderIdentifier(
 	FolderId FolderId
 ) {
 	public static readonly FolderIdentifier None = new FolderIdentifier( FileSystemId.None, FolderId.None );
+
+	public override string ToString() {
+		return $"{FileSystemId}::{FolderId}";
+	}
 }

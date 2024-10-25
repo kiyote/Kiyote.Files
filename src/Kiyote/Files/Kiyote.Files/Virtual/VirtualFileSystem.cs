@@ -75,6 +75,19 @@ internal sealed class VirtualFileSystem : IFileSystem {
 	}
 
 	Task<FileIdentifier> IFileSystem.CreateFileAsync(
+		string fileName,
+		Func<Stream, CancellationToken, Task> contentWriter,
+		CancellationToken cancellationToken
+	) {
+		return ( this as IFileSystem ).CreateFileAsync(
+			_root,
+			fileName,
+			contentWriter,
+			cancellationToken
+		);
+	}
+
+	Task<FileIdentifier> IFileSystem.CreateFileAsync(
 		FolderIdentifier folderIdentifier,
 		string fileName,
 		Func<Stream, CancellationToken, Task> contentWriter,
@@ -176,6 +189,50 @@ internal sealed class VirtualFileSystem : IFileSystem {
 		}
 		// There isn't a file system mounted at that path, so nothing to do
 		throw new InvalidPathException();
+	}
+
+	FileIdentifier IReadOnlyFileSystem.GetFileIdentifier(
+		string fileName
+	) {
+		return ( this as IReadOnlyFileSystem ).GetFileIdentifier(
+			_root,
+			fileName
+		);
+	}
+
+	FileIdentifier IReadOnlyFileSystem.GetFileIdentifier(
+		FolderIdentifier folderIdentifier,
+		string fileName
+	) {
+		List<MappedFileSystem<IReadOnlyFileSystem>> lmfs = GetReadOnly( folderIdentifier.FolderId );
+		if (lmfs.Count == 1) {
+			MappedFileSystem<IReadOnlyFileSystem> mfs = lmfs[ 0 ];
+			if( !mfs.PathMapper.TryMapFromVirtual(
+				folderIdentifier.FolderId,
+				out FolderIdentifier mappedFolderIdentifier
+			) ) {
+				throw new InvalidPathException();
+			}
+
+			FileIdentifier fileIdentifier = mfs.FileSystem.GetFileIdentifier(
+				mappedFolderIdentifier,
+				fileName
+			);
+
+			if( !mfs.PathMapper.TryMapToVirtual(
+				fileIdentifier,
+				out FileId virtualFileId
+			) ) {
+				throw new InvalidPathException();
+			}
+			return new FileIdentifier( _fileSystemId, virtualFileId );
+		}
+		throw new PathNotFoundException();
+	}
+
+	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
+	) {
+		return ( this as IReadOnlyFileSystem ).GetFileIdentifiers( _root );
 	}
 
 	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
@@ -304,7 +361,7 @@ internal sealed class VirtualFileSystem : IFileSystem {
 		}
 		// This is a pure virtual path
 		IEnumerable<FolderIdentifier> fids = lmfs.Select( mfs => new FolderIdentifier( _fileSystemId, mfs.MountAtFolder ) );
-		return fids.First( fid => fid.FolderId == folderId ) ?? throw new FolderNotFoundException();
+		return fids.First( fid => fid.FolderId == folderId ) ?? throw new PathNotFoundException();
 	}
 
 	private List<MappedFileSystem<IFileSystem>> GetReadWrite(

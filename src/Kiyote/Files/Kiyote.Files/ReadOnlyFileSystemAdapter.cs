@@ -23,6 +23,11 @@ public sealed class ReadOnlyFileSystemAdapter<T> : IReadOnlyFileSystem<T> where 
 	}
 
 	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
+	) {
+		return _fileSystem.GetFileIdentifiers();
+	}
+
+	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
 		FolderIdentifier folderIdentifier
 	) {
 		return _fileSystem.GetFileIdentifiers(
@@ -58,5 +63,21 @@ public sealed class ReadOnlyFileSystemAdapter<T> : IReadOnlyFileSystem<T> where 
 
 	FolderIdentifier IReadOnlyFileSystem.GetRoot() {
 		return _fileSystem.GetRoot();
+	}
+
+	FileIdentifier IReadOnlyFileSystem.GetFileIdentifier(
+		string fileName
+	) {
+		return _fileSystem.GetFileIdentifier( fileName );
+	}
+
+	FileIdentifier IReadOnlyFileSystem.GetFileIdentifier(
+		FolderIdentifier folderIdentifier,
+		string fileName
+	) {
+		return _fileSystem.GetFileIdentifier(
+			folderIdentifier,
+			fileName
+		);
 	}
 }

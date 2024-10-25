@@ -39,10 +39,37 @@ public class ResourceFileSystemTests {
 
 	[Test]
 	public void GetFileIdentifiers_Root_Returns2Files() {
-		FolderIdentifier root = _fileSystem.GetRoot();
-		List<FileIdentifier> files = _fileSystem.GetFileIdentifiers( root ).ToList();
+		List<FileIdentifier> files = _fileSystem.GetFileIdentifiers().ToList();
 
 		Assert.That( files.Count, Is.EqualTo( 2 ) );
+		Assert.That( files.ElementAt( 0 ).FileId.ToString(), Is.EqualTo( "\\Kiyote.Files.Resource.IntegrationTests.TestResources.Folder.subitem.txt" ) );
+		Assert.That( files.ElementAt( 1 ).FileId.ToString(), Is.EqualTo( "\\Kiyote.Files.Resource.IntegrationTests.TestResources.item.txt" ) );
 	}
 
+	[Test]
+	public void GetFileIdentifier_ExistingFile_ReturnsCorrectFileIdentifier() {
+		FileIdentifier fileIdentifier = _fileSystem.GetFileIdentifier( "Kiyote.Files.Resource.IntegrationTests.TestResources.item.txt" );
+
+		Assert.That( fileIdentifier.FileId.ToString(), Is.EqualTo( "\\Kiyote.Files.Resource.IntegrationTests.TestResources.item.txt" ) );
+	}
+
+	[Test]
+	public void GetFileIdentifier_NonExistantFile_ThrowsPathNotFoundException() {
+		_ = Assert.Throws<PathNotFoundException>( () => _fileSystem.GetFileIdentifier( "garbage" ) );
+	}
+
+	[Test]
+	public async Task GetContentAsync_ExistingFile_ContentMatches() {
+		FileIdentifier fileIdentifier = _fileSystem.GetFileIdentifier( "Kiyote.Files.Resource.IntegrationTests.TestResources.item.txt" );
+
+		await _fileSystem.GetContentAsync(
+			fileIdentifier,
+			async ( stream, cancellationToken ) => {
+				TextReader reader = new StreamReader( stream );
+				string content = await reader.ReadToEndAsync( cancellationToken );
+				Assert.That( content.Trim(), Is.EqualTo( "item" ) ); // Ignore line-ending issues
+			},
+			CancellationToken.None
+		);
+	}
 }

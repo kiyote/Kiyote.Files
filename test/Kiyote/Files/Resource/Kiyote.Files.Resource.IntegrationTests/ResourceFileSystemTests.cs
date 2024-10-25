@@ -10,6 +10,7 @@ public class ResourceFileSystemTests {
 
 	private IReadOnlyFileSystem _fileSystem;
 	private IServiceScope _scope;
+	private string _separator;
 
 	[SetUp]
 	public void SetUp() {
@@ -23,6 +24,7 @@ public class ResourceFileSystemTests {
 		IServiceProvider services = serviceCollection.BuildServiceProvider();
 		_scope = services.CreateAsyncScope();
 		_fileSystem = services.GetRequiredKeyedService<IReadOnlyFileSystem>( "Test" );
+		_separator = Path.DirectorySeparatorChar.ToString();
 	}
 
 	[TearDown]
@@ -42,15 +44,15 @@ public class ResourceFileSystemTests {
 		List<FileIdentifier> files = _fileSystem.GetFileIdentifiers().ToList();
 
 		Assert.That( files.Count, Is.EqualTo( 2 ) );
-		Assert.That( files.ElementAt( 0 ).FileId.ToString(), Is.EqualTo( "\\Kiyote.Files.Resource.IntegrationTests.TestResources.Folder.subitem.txt" ) );
-		Assert.That( files.ElementAt( 1 ).FileId.ToString(), Is.EqualTo( "\\Kiyote.Files.Resource.IntegrationTests.TestResources.item.txt" ) );
+		Assert.That( files.ElementAt( 0 ).FileId.ToString(), Is.EqualTo( $"{_separator}Kiyote.Files.Resource.IntegrationTests.TestResources.Folder.subitem.txt" ) );
+		Assert.That( files.ElementAt( 1 ).FileId.ToString(), Is.EqualTo( $"{_separator}Kiyote.Files.Resource.IntegrationTests.TestResources.item.txt" ) );
 	}
 
 	[Test]
 	public void GetFileIdentifier_ExistingFile_ReturnsCorrectFileIdentifier() {
 		FileIdentifier fileIdentifier = _fileSystem.GetFileIdentifier( "Kiyote.Files.Resource.IntegrationTests.TestResources.item.txt" );
 
-		Assert.That( fileIdentifier.FileId.ToString(), Is.EqualTo( "\\Kiyote.Files.Resource.IntegrationTests.TestResources.item.txt" ) );
+		Assert.That( fileIdentifier.FileId.ToString(), Is.EqualTo( $"{_separator}Kiyote.Files.Resource.IntegrationTests.TestResources.item.txt" ) );
 	}
 
 	[Test]

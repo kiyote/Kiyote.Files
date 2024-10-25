@@ -67,19 +67,84 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 
 	internal char Separator { get; }
 
-	Task IReadOnlyFileSystem.GetContentAsync(
-		FileIdentifier fileId,
+	async Task IReadOnlyFileSystem.GetContentAsync(
+		FileIdentifier fileIdentifier,
 		Func<Stream, CancellationToken, Task> contentReader,
 		CancellationToken cancellationToken
 	) {
-		throw new NotImplementedException();
+		if( _provider is null ) {
+			using Stream stream = _assembly.GetManifestResourceStream( fileIdentifier.FileId.ToString()[ 1.. ] ) ?? throw new ContentUnavailableException();
+			await contentReader( stream, cancellationToken );
+			return;
+		} else {
+			string path = ToPath( fileIdentifier.FileId );
+			IFileInfo fileInfo = _provider.GetFileInfo( path );
+			using Stream stream = fileInfo.CreateReadStream();
+			await contentReader( stream, cancellationToken );
+		}
+	}
+
+	FileIdentifier IReadOnlyFileSystem.GetFileIdentifier(
+		string fileName
+	) {
+		return ( this as IReadOnlyFileSystem ).GetFileIdentifier( _root, fileName );
+	}
+
+	FileIdentifier IReadOnlyFileSystem.GetFileIdentifier(
+		FolderIdentifier folderIdentifier,
+		string fileName
+	) {
+		if( _provider is null ) {
+
+			if( folderIdentifier != _root ) {
+				_logger?.GetFlatFolderFileIdentifier( folderIdentifier, fileName );
+				throw new PathNotFoundException();
+			}
+			foreach( string resourceName in _assembly.GetManifestResourceNames() ) {
+				if( resourceName.Equals( fileName, StringComparison.Ordinal ) ) {
+					return new FileIdentifier(
+						FileSystemId,
+						ToFileId( folderIdentifier.FolderId, resourceName )
+					);
+				}
+			}
+			_logger?.MissingFileIdentifier( folderIdentifier, fileName );
+			throw new PathNotFoundException();
+
+		} else {
+
+			string path = ToPath( folderIdentifier.FolderId );
+			IDirectoryContents contents = _provider.GetDirectoryContents( path );
+			foreach( IFileInfo item in contents ) {
+				if( item.IsDirectory ) {
+					continue;
+				}
+				if( item.Name.Equals( fileName, StringComparison.Ordinal ) ) {
+					return new FileIdentifier(
+						FileSystemId,
+						ToFileId( folderIdentifier.FolderId, item.Name )
+					);
+				}
+			}
+			_logger?.MissingFileIdentifier( folderIdentifier, fileName );
+			throw new PathNotFoundException();
+		}
+	}
+
+	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
+	) {
+		return ( this as IReadOnlyFileSystem ).GetFileIdentifiers( _root );
 	}
 
 	IEnumerable<FileIdentifier> IReadOnlyFileSystem.GetFileIdentifiers(
 		FolderIdentifier folderIdentifier
 	) {
 		if( _provider is null ) {
-			_logger?.GetFlatFileIdentifiers();
+
+			if( folderIdentifier != _root ) {
+				_logger?.GetFlatFileIdentifiers( folderIdentifier );
+				throw new PathNotFoundException();
+			}
 			foreach( string resourceName in _assembly.GetManifestResourceNames() ) {
 				yield return new FileIdentifier(
 					FileSystemId,
@@ -87,8 +152,22 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 				);
 			}
 			yield break;
+
+		} else {
+
+			string path = ToPath( folderIdentifier.FolderId );
+			IDirectoryContents contents = _provider.GetDirectoryContents( path );
+			foreach( IFileInfo item in contents ) {
+				if( item.IsDirectory ) {
+					continue;
+				}
+				yield return new FileIdentifier(
+					FileSystemId,
+					ToFileId( folderIdentifier.FolderId, item.Name )
+				);
+			}
+
 		}
-		throw new NotImplementedException();
 	}
 
 	IEnumerable<FolderIdentifier> IReadOnlyFileSystem.GetFolderIdentifiers() {
@@ -99,20 +178,24 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 		FolderIdentifier folderIdentifier
 	) {
 		if( _provider is null ) {
+
 			_logger?.GetFlatFolderIdentifiers();
 			yield break;
-		}
 
-		string folder = ToFolder( folderIdentifier.FolderId );
+		} else {
 
-		IDirectoryContents directoryContents = _provider.GetDirectoryContents( folder );
-		foreach( IFileInfo? info in directoryContents ) {
-			if( info?.IsDirectory ?? false ) {
-				yield return new FolderIdentifier(
-					FileSystemId,
-					ToFolderId( folderIdentifier.FolderId, info.Name )
-				);
+			string folder = ToPath( folderIdentifier.FolderId );
+
+			IDirectoryContents directoryContents = _provider.GetDirectoryContents( folder );
+			foreach( IFileInfo? info in directoryContents ) {
+				if( info?.IsDirectory ?? false ) {
+					yield return new FolderIdentifier(
+						FileSystemId,
+						ToFolderId( folderIdentifier.FolderId, info.Name )
+					);
+				}
 			}
+
 		}
 	}
 
@@ -134,20 +217,20 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 		string folderName
 	) {
 		if( string.IsNullOrWhiteSpace( folderName )
-			|| string.Equals( folderName,  _root.FolderId, StringComparison.Ordinal )
+			|| string.Equals( folderName, _root.FolderId, StringComparison.Ordinal )
 		) {
 			return _root;
 		}
 		if( _provider is null ) {
 			_logger?.GetFlatFolder( folderName );
-			throw new FolderNotFoundException();
+			throw new PathNotFoundException();
 		}
 
 		FolderId folderId = ToFolderId( parentFolderIdentifier.FolderId, folderName );
-		string folder = ToFolder( folderId );
+		string folder = ToPath( folderId );
 		IDirectoryContents contents = _provider.GetDirectoryContents( folder );
-		if (contents is NotFoundDirectoryContents) {
-			throw new FolderNotFoundException();
+		if( contents is NotFoundDirectoryContents ) {
+			throw new PathNotFoundException();
 		}
 
 		return new FolderIdentifier(
@@ -176,7 +259,7 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 		return $"{folderId}{fileName}";
 	}
 
-	internal string ToFolder(
+	internal string ToPath(
 		FolderId folderId
 	) {
 		string folder = folderId;
@@ -187,5 +270,13 @@ internal sealed class ResourceFileSystem : IReadOnlyFileSystem {
 		}
 
 		return folder;
+	}
+
+	internal string ToPath(
+		FileId fileId
+	) {
+		string path = $"{_root.FolderId.AsSpan()[..^1]}{fileId}";
+
+		return path;
 	}
 }

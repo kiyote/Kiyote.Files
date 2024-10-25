@@ -5,4 +5,8 @@ public sealed record FileIdentifier(
 	FileId FileId
 ) {
 	public static readonly FileIdentifier None = new FileIdentifier( FileSystemId.None, FileId.None );
+
+	public override string ToString() {
+		return $"{FileSystemId}::{FileId}";
+	}
 }

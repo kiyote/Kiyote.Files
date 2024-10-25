@@ -9,7 +9,19 @@ public interface IReadOnlyFileSystem {
 	);
 
 	IEnumerable<FileIdentifier> GetFileIdentifiers(
+	);
+
+	IEnumerable<FileIdentifier> GetFileIdentifiers(
 		FolderIdentifier folderIdentifier
+	);
+
+	FileIdentifier GetFileIdentifier(
+		string fileName
+	);
+
+	FileIdentifier GetFileIdentifier(
+		FolderIdentifier folderIdentifier,
+		string fileName
 	);
 
 	FolderIdentifier GetRoot();

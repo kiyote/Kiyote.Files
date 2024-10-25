@@ -3,18 +3,18 @@
 namespace Kiyote.Files;
 
 [ExcludeFromCodeCoverage]
-public sealed class FolderNotFoundException : Exception {
-	public FolderNotFoundException(
+public sealed class PathNotFoundException : Exception {
+	public PathNotFoundException(
 		string message
 	) : base( message ) {
 	}
 
-	public FolderNotFoundException(
+	public PathNotFoundException(
 		string message,
 		Exception innerException
 	) : base( message, innerException ) {
 	}
 
-	public FolderNotFoundException() {
+	public PathNotFoundException() {
 	}
 }

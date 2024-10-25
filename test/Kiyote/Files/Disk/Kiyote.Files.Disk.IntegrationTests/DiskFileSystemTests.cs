@@ -1,4 +1,6 @@
-﻿namespace Kiyote.Files.Disk.IntegrationTests;
+﻿using System.Threading;
+
+namespace Kiyote.Files.Disk.IntegrationTests;
 
 [TestFixture]
 [ExcludeFromCodeCoverage]
@@ -93,6 +95,7 @@ public sealed class DiskFileSystemTests {
 			async ( Stream stream, CancellationToken token ) => {
 				using TextWriter writer = new StreamWriter( stream );
 				await writer.WriteAsync( expected.AsMemory(), token );
+				await writer.FlushAsync( token );
 			},
 			CancellationToken.None
 		);
@@ -109,7 +112,7 @@ public sealed class DiskFileSystemTests {
 
 		string fileName = "test.txt";
 		string expected = "contents";
-		_ = Assert.ThrowsAsync<FolderNotFoundException>(
+		_ = Assert.ThrowsAsync<PathNotFoundException>(
 			() => _files.CreateFileAsync(
 				folderIdentifier,
 				fileName,
@@ -232,4 +235,20 @@ public sealed class DiskFileSystemTests {
 		Assert.That( _files.GetFolderIdentifiers().Count(), Is.EqualTo( 0 ) );
 	}
 
+	[Test]
+	public async Task GetFileIdentifier_RootExistingFile_ReturnsFileIdentifier() {
+		FileIdentifier expected = await _files.CreateFileAsync(
+			"test.txt",
+			async ( stream, cancellationToken ) => {
+				using TextWriter writer = new StreamWriter( stream );
+				await writer.WriteAsync( "test".AsMemory(), cancellationToken );
+				await writer.FlushAsync( cancellationToken );
+			},
+			CancellationToken.None
+		);
+
+		FileIdentifier actual = _files.GetFileIdentifier( "test.txt" );
+
+		Assert.That( expected, Is.EqualTo( actual ) );
+	}
 }

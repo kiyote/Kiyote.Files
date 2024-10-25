@@ -3,6 +3,12 @@
 public interface IFileSystem: IReadOnlyFileSystem {
 
 	Task<FileIdentifier> CreateFileAsync(
+		string fileName,
+		Func<Stream, CancellationToken, Task> contentWriter,
+		CancellationToken cancellationToken
+	);
+
+	Task<FileIdentifier> CreateFileAsync(
 		FolderIdentifier folderIdentifier,
 		string fileName,
 		Func<Stream, CancellationToken, Task> contentWriter,

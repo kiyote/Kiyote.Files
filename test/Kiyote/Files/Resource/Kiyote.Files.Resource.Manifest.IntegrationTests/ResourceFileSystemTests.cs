@@ -12,6 +12,7 @@ public class ResourceFileSystemTests {
 
 	private IReadOnlyFileSystem _fileSystem;
 	private IServiceScope _scope;
+	private string _separator;
 
 	[SetUp]
 	public void SetUp() {
@@ -30,6 +31,7 @@ public class ResourceFileSystemTests {
 		IServiceProvider services = serviceCollection.BuildServiceProvider();
 		_scope = services.CreateAsyncScope();
 		_fileSystem = services.GetRequiredKeyedService<IReadOnlyFileSystem>( "Test" );
+		_separator = Path.DirectorySeparatorChar.ToString();
 	}
 
 	[TearDown]
@@ -46,7 +48,7 @@ public class ResourceFileSystemTests {
 	public void GetFolderIdentifier_GoodFolder_ReturnsOneFolderIdentifier() {
 		FolderIdentifier folder = _fileSystem.GetFolderIdentifier( "Folder" );
 
-		Assert.That( folder.FolderId, Is.EqualTo( $"{Path.DirectorySeparatorChar}Folder{Path.DirectorySeparatorChar}" ) );
+		Assert.That( folder.FolderId, Is.EqualTo( $"{_separator}Folder{_separator}" ) );
 	}
 
 	[Test]
@@ -65,7 +67,7 @@ public class ResourceFileSystemTests {
 		List<FolderIdentifier> folders = _fileSystem.GetFolderIdentifiers( folderIdentifier ).ToList();
 
 		Assert.That( folders.Count, Is.EqualTo( 1 ) );
-		Assert.That( folders.ElementAt( 0 ).FolderId, Is.EqualTo( $"{Path.DirectorySeparatorChar}Folder{Path.DirectorySeparatorChar}SubFolder{Path.DirectorySeparatorChar}" ) );
+		Assert.That( folders.ElementAt( 0 ).FolderId, Is.EqualTo( $"{_separator}Folder{_separator}SubFolder{_separator}" ) );
 	}
 
 	[Test]
@@ -73,7 +75,7 @@ public class ResourceFileSystemTests {
 		List<FileIdentifier> fileIdentifiers = _fileSystem.GetFileIdentifiers().ToList();
 
 		Assert.That( fileIdentifiers.Count, Is.EqualTo( 1 ) );
-		Assert.That( fileIdentifiers.ElementAt( 0 ).FileId.ToString(), Is.EqualTo( @"\item.txt" ) );
+		Assert.That( fileIdentifiers.ElementAt( 0 ).FileId.ToString(), Is.EqualTo( $"{_separator}item.txt" ) );
 	}
 
 	[Test]
@@ -82,14 +84,14 @@ public class ResourceFileSystemTests {
 		List<FileIdentifier> fileIdentifiers = _fileSystem.GetFileIdentifiers( folderIdentifier ).ToList();
 
 		Assert.That( fileIdentifiers.Count, Is.EqualTo( 1 ) );
-		Assert.That( fileIdentifiers.ElementAt( 0 ).FileId.ToString(), Is.EqualTo( @"\Folder\subitem.txt" ) );
+		Assert.That( fileIdentifiers.ElementAt( 0 ).FileId.ToString(), Is.EqualTo( $"{_separator}Folder{_separator}subitem.txt" ) );
 	}
 
 	[Test]
 	public void GetFileIdentifier_RootExistingFile_ReturnsCorrectFileIdentifier() {
 		FileIdentifier fileIdentifier = _fileSystem.GetFileIdentifier( "item.txt" );
 
-		Assert.That( fileIdentifier.FileId.ToString(), Is.EqualTo( @"\item.txt" ) );
+		Assert.That( fileIdentifier.FileId.ToString(), Is.EqualTo( $"{_separator}item.txt" ) );
 	}
 
 	[Test]
@@ -97,7 +99,7 @@ public class ResourceFileSystemTests {
 		FolderIdentifier folderIdentifier = _fileSystem.GetFolderIdentifier( "Folder" );
 		FileIdentifier fileIdentifier = _fileSystem.GetFileIdentifier( folderIdentifier, "subitem.txt" );
 
-		Assert.That( fileIdentifier.FileId.ToString(), Is.EqualTo( @"\Folder\subitem.txt" ) );
+		Assert.That( fileIdentifier.FileId.ToString(), Is.EqualTo( $"{_separator}Folder{_separator}subitem.txt" ) );
 	}
 
 	[Test]

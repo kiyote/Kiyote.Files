@@ -8,7 +8,6 @@ namespace Kiyote.Files.Disk.UnitTests;
 [ExcludeFromCodeCoverage]
 public sealed class DiskFileSystemTests {
 
-	public const char Separator = '\\';
 	public const string Root = @"FAKE:\FOLDER";
 	public static readonly char[] InvalidPathChars = ['/', '\\'];
 	public static readonly char[] InvalidFileNameChars = [ '/', '\\', ':' ];
@@ -20,17 +19,14 @@ public sealed class DiskFileSystemTests {
 	public void SetUp() {
 		_path = new Mock<IPath>( MockBehavior.Strict );
 		_ = _path
-			.Setup( p => p.DirectorySeparatorChar )
-			.Returns( Separator );
-		_ = _path
 			.Setup( p => p.GetInvalidPathChars() )
 			.Returns( InvalidPathChars );
 		_ = _path
 			.Setup( p => p.DirectorySeparatorChar )
-			.Returns( '\\' );
+			.Returns( Path.DirectorySeparatorChar );
 		_ = _path
 			.Setup( p => p.AltDirectorySeparatorChar )
-			.Returns( '/' );
+			.Returns( Path.AltDirectorySeparatorChar );
 		_ = _path
 			.Setup( p => p.GetInvalidFileNameChars() )
 			.Returns( InvalidFileNameChars );

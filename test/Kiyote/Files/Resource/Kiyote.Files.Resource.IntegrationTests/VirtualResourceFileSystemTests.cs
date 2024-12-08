@@ -16,7 +16,7 @@ public sealed class VirtualResourceFileSystemTests {
 
 	private const string VirtualRoot = "Resource";
 
-	private IServiceScope? _scope;
+	private AsyncServiceScope? _scope;
 	private IFileSystem<FS> _fileSystem;
 	
 
@@ -30,9 +30,9 @@ public sealed class VirtualResourceFileSystemTests {
 			} );
 
 		IServiceProvider provider = services.BuildServiceProvider();
-		_scope = provider.CreateAsyncScope();
 
-		_fileSystem = _scope.ServiceProvider.GetRequiredService<IFileSystem<FS>>();
+		_scope = provider.CreateAsyncScope();
+		_fileSystem = _scope.Value.ServiceProvider.GetRequiredService<IFileSystem<FS>>();
 	}
 
 	[TearDown]

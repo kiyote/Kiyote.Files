@@ -7,7 +7,7 @@ namespace Kiyote.Files.Disk.IntegrationTests;
 public sealed class DiskFileSystemTests {
 
 	private IFileSystem _files;
-	private System.IO.Abstractions.IFileSystem _fileSystem;
+	private FileSystem _fileSystem;
 	private string _testFolder;
 
 	[SetUp]

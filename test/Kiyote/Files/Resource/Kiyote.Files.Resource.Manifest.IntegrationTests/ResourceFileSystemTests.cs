@@ -11,7 +11,7 @@ namespace Kiyote.Files.Resource.Manifest.IntegrationTests;
 public class ResourceFileSystemTests {
 
 	private IReadOnlyFileSystem _fileSystem;
-	private IServiceScope _scope;
+	private AsyncServiceScope? _scope;
 	private string _separator;
 
 	[SetUp]
@@ -30,7 +30,7 @@ public class ResourceFileSystemTests {
 
 		IServiceProvider services = serviceCollection.BuildServiceProvider();
 		_scope = services.CreateAsyncScope();
-		_fileSystem = services.GetRequiredKeyedService<IReadOnlyFileSystem>( "Test" );
+		_fileSystem = _scope.Value.ServiceProvider.GetRequiredKeyedService<IReadOnlyFileSystem>( "Test" );
 		_separator = Path.DirectorySeparatorChar.ToString();
 	}
 

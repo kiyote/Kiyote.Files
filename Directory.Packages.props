@@ -22,6 +22,6 @@
     <PackageVersion Include="NUnit" Version="4.2.2" />
     <PackageVersion Include="NUnit.Analyzers" Version="4.4.0" />
     <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
-    <PackageVersion Include="System.IO.Abstractions" Version="21.1.7" />
+    <PackageVersion Include="System.IO.Abstractions" Version="21.2.1" />
   </ItemGroup>
 </Project>

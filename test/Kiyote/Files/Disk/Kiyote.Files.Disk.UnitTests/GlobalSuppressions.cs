@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage( "Naming", "CA1707:Identifiers should not contain underscores", Justification = "Test names are METHOD_CONDITION_EXPECTATION", Scope = "module" )]
+[assembly: SuppressMessage( "Maintainability", "CA1515:Consider making public types internal", Justification = "Code not released, doesn't mattter.", Scope = "module" )]

@@ -61,7 +61,7 @@ jobs:
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
 
       - name: Make Coverage Badge      
-        uses: action-badges/cobertura-coverage-xml-badges@0.4.0
+        uses: action-badges/cobertura-coverage-xml-badges@0.4.1
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         with:
           file-name: coverage.svg

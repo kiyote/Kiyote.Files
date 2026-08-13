@@ -1,0 +1,48 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path=".runsettings" />
+    <File Path="DEVELOPMENT.md" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="forceclean.ps1" />
+    <File Path="LICENSE" />
+    <File Path="nuget.config" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Solution Items/.github/">
+    <File Path=".github/dependabot.yaml" />
+  </Folder>
+  <Folder Name="/Solution Items/.github/workflows/">
+    <File Path=".github/workflows/ci.yml" />
+    <File Path=".github/workflows/release.yml" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Kiyote/" />
+  <Folder Name="/src/Kiyote/Files/">
+    <Project Path="src/Kiyote/Files/Kiyote.Files/Kiyote.Files.csproj" />
+  </Folder>
+  <Folder Name="/src/Kiyote/Files/Disk/">
+    <Project Path="src/Kiyote/Files/Disk/Kiyote.Files.Disk/Kiyote.Files.Disk.csproj" />
+  </Folder>
+  <Folder Name="/src/Kiyote/Files/Resource/">
+    <Project Path="src/Kiyote/Files/Resource/Kiyote.Files.Resource/Kiyote.Files.Resource.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <File Path="test/.runsettings" />
+  </Folder>
+  <Folder Name="/test/Kiyote/" />
+  <Folder Name="/test/Kiyote/Files/">
+    <Project Path="test/Kiyote/Files/Kiyote.Files.IntegrationTests/Kiyote.Files.IntegrationTests.csproj" />
+    <Project Path="test/Kiyote/Files/Kiyote.Files.UnitTests/Kiyote.Files.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/test/Kiyote/Files/Disk/">
+    <Project Path="test/Kiyote/Files/Disk/Kiyote.Files.Disk.IntegrationTests/Kiyote.Files.Disk.IntegrationTests.csproj" />
+    <Project Path="test/Kiyote/Files/Disk/Kiyote.Files.Disk.UnitTests/Kiyote.Files.Disk.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/test/Kiyote/Files/Resource/">
+    <Project Path="test/Kiyote/Files/Resource/Kiyote.Files.Resource.IntegrationTests/Kiyote.Files.Resource.IntegrationTests.csproj" />
+    <Project Path="test/Kiyote/Files/Resource/Kiyote.Files.Resource.Manifest.IntegrationTests/Kiyote.Files.Resource.Manifest.IntegrationTests.csproj" />
+  </Folder>
+</Solution>

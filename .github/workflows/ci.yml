@@ -7,7 +7,7 @@ on:
     - '.github/workflows/ci.yml'
     - 'src/**'
     - 'test/**'
-    - 'Kiyote.Files.sln'
+    - 'Kiyote.Files.slnx'
     - 'Directory.Packages.props'
     - 'Directory.Build.props'
     - 'nuget.config'
